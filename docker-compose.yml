@@ -1,0 +1,28 @@
+# Uso sin VS Code:  docker compose up
+# Primera vez instala dependencias, aplica migraciones, corre el seed y levanta web + api.
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    command: bash -c "bash docker/setup.sh && pnpm dev"
+    ports:
+      - '5173:5173' # web (Vite)
+      - '8787:8787' # api (Wrangler)
+    environment:
+      VITE_USE_POLLING: '1'
+    volumes:
+      - .:/workspace:cached
+      # node_modules en volúmenes nombrados: no se mezclan binarios de macOS/Windows con los de Linux.
+      - node_modules:/workspace/node_modules
+      - node_modules_web:/workspace/apps/web/node_modules
+      - node_modules_api:/workspace/apps/api/node_modules
+      - node_modules_shared:/workspace/packages/shared/node_modules
+      # El estado local de Wrangler (D1 y R2 simulados) vive en apps/api/.wrangler,
+      # dentro del bind mount, así que persiste entre reinicios (y está en .gitignore).
+
+volumes:
+  node_modules:
+  node_modules_web:
+  node_modules_api:
+  node_modules_shared:

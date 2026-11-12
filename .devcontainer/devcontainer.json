@@ -1,0 +1,31 @@
+{
+  "name": "Shopsito",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  // En el devcontainer no arrancamos `pnpm dev` automáticamente: se corre en la terminal.
+  "overrideCommand": true,
+  "remoteUser": "node",
+  "forwardPorts": [5173, 8787],
+  "portsAttributes": {
+    "5173": { "label": "web (Vite)" },
+    "8787": { "label": "api (Wrangler)" }
+  },
+  "postCreateCommand": "bash docker/setup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "vitest.explorer",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  }
+}
