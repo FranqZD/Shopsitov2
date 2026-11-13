@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ahoraCampus, crearProductoSchema } from './index'
+import { ahoraCampus, crearProductoSchema, segundosHastaHora } from './index'
 
 describe('ahoraCampus', () => {
   it('convierte a la hora de Ciudad de México (UTC-6)', () => {
@@ -7,6 +7,17 @@ describe('ahoraCampus', () => {
       fecha: '2026-03-09',
       hora: '20:30',
     })
+  })
+})
+
+describe('segundosHastaHora', () => {
+  it('cuenta los segundos que faltan en hora del campus', () => {
+    // 2026-03-10T16:12:18Z = 10:12:18 en Ciudad de México
+    expect(segundosHastaHora('10:30', new Date('2026-03-10T16:12:18Z'))).toBe(17 * 60 + 42)
+  })
+
+  it('es negativo si la hora ya pasó', () => {
+    expect(segundosHastaHora('10:00', new Date('2026-03-10T16:12:18Z'))).toBeLessThan(0)
   })
 })
 
