@@ -1,6 +1,6 @@
 import { colorAvatar, iniciales } from '../lib/formato'
 
-/** Círculo con iniciales en Gabarito sobre un pastel estable por usuario (DESIGN.md §2). */
+/** Círculo con iniciales en Gabarito sobre un pastel estable por usuario. */
 /** `mini` (22 px en tarjetas) usa Figtree y texto #1B2333, como en el diseño. */
 export function Avatar({
   id,

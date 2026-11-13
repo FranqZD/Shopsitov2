@@ -1,5 +1,5 @@
 // Seed local: borra los datos y vuelve a insertar usuarios, puntos de entrega y productos de HOY.
-// Los datos siguen los ejemplos del diseño (referencias/) y las horas límite se calculan
+// Los datos siguen los ejemplos del diseño y las horas límite se calculan
 // relativas a "ahora" para que se vean los contadores de "Faltan 17:42" y "Se acaba pronto".
 // Uso: pnpm db:seed (aplica sobre la D1 simulada en .wrangler/, nunca en la nube).
 import { execFileSync } from 'node:child_process'

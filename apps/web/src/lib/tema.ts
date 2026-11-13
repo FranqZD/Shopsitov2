@@ -1,4 +1,4 @@
-// Tema: data-theme="oscuro" en <html> (DESIGN.md §2). index.html lo aplica antes de pintar.
+// Tema: data-theme="oscuro" en <html>. index.html lo aplica antes de pintar.
 export type Tema = 'claro' | 'oscuro'
 const CLAVE = 'shopsito.tema'
 

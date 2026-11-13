@@ -34,7 +34,7 @@ export function iniciales(nombre: string) {
 /** Primer nombre: "Mariana López" → "Mariana". */
 export const nombreCorto = (nombre: string) => nombre.trim().split(/\s+/)[0] ?? nombre
 
-// Fondos pastel de avatar (DESIGN.md §2); el texto siempre va en #1F3A68.
+// Fondos pastel de avatar; el texto siempre va en #1F3A68.
 const PASTELES = ['#E4F3EA', '#FFE0B0', '#D5E1F0', '#F6DCE6']
 
 /** Color estable por usuario para que su avatar no cambie entre pantallas. */

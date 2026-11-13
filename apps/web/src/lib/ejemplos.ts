@@ -1,4 +1,4 @@
-// Datos de ejemplo tomados del diseño (referencias/fuente/*.dc.html) para las pantallas
+// Datos de ejemplo del diseño para las pantallas
 // cuya API todavía responde 501. Cada uso tiene un TODO para cambiarlo por la API real.
 import type { EstadoPedido, EstadoReporte } from '@shopsito/shared'
 

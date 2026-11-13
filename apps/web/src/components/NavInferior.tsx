@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import { useItemsNav } from '../lib/navegacion'
 
-/** Celular: pastilla flotante abajo con Hoy · Vender · Pedidos · Perfil (DESIGN.md §5). */
+/** Celular: pastilla flotante abajo con Hoy · Vender · Pedidos · Perfil. */
 export function NavInferior() {
   const items = useItemsNav()
   return (

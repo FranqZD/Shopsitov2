@@ -1,4 +1,4 @@
-/* Copia de referencias/tokens/shopsito.css (diseño aprobado v0.3).
+/* Tokens de diseño de Shopsito (v0.3).
    Las fuentes se cargan en index.html, no aquí. Si cambian los tokens, actualiza ambos. */
 
 @custom-variant dark (&:where([data-theme=oscuro], [data-theme=oscuro] *));

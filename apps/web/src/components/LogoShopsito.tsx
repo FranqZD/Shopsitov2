@@ -1,4 +1,4 @@
-/** Icono de la app (referencias/icono/icon.svg) dibujado inline para poder escalarlo. */
+/** Icono de la app (public/icon.svg) dibujado inline para poder escalarlo. */
 export function LogoShopsito({ size = 72 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 1024 1024" aria-hidden="true">

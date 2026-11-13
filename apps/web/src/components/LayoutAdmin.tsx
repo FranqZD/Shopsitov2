@@ -8,7 +8,7 @@ import { Boton } from './Boton'
 // TODO: contar con GET /api/reportes cuando esté implementado.
 const ABIERTOS = REPORTES.filter((r) => r.estado === 'abierto').length
 
-/** Admin de escritorio: menú lateral + contenido (DESIGN.md §6, pantalla 11). */
+/** Admin de escritorio: menú lateral + contenido. */
 export function LayoutAdmin() {
   const sesion = getSesion()
 

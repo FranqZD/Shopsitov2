@@ -1,7 +1,7 @@
 import { Clock } from 'lucide-react'
 import { formatoCuenta } from '../lib/formato'
 
-/** Una publicación es urgente cuando faltan ≤ 30 min (DESIGN.md §6). */
+/** Una publicación es urgente cuando faltan ≤ 30 min. */
 export const SEGUNDOS_URGENTE = 1800
 
 /** Chip blanco "Hasta 10:30" (colores fijos: va sobre la foto en ambos temas). */

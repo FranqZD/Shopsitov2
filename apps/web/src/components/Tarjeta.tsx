@@ -17,7 +17,7 @@ export type DatosTarjeta = {
   vendedor: { id: string; nombre: string; insigniaComunidad: boolean }
 }
 
-/** Tarjeta de producto del catálogo: la foto es la protagonista (DESIGN.md §5). */
+/** Tarjeta de producto del catálogo: la foto es la protagonista. */
 export function Tarjeta({ p, segundos }: { p: DatosTarjeta; segundos: number }) {
   const agotado = p.agotado || p.cantidad === 0
   const urgente = !agotado && segundos <= SEGUNDOS_URGENTE

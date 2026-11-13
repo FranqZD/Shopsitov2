@@ -82,25 +82,29 @@ Si cambias `wrangler.toml`, regenera los tipos del runtime con `pnpm --filter @s
 
 ## Diseño del frontend
 
-El diseño aprobado está en [`referencias/`](referencias/) y es la **fuente de verdad** del frontend:
+El diseño que ya está en la app es la referencia: tokens, componentes base y pantallas. Cualquier pantalla nueva debe verse como las existentes.
 
-- [`referencias/DESIGN.md`](referencias/DESIGN.md): principios, tokens, componentes, pantallas y reglas (urgencia con mango, nunca con rojo; textos finales; etc.).
-- `referencias/pantallas/*.png`: cómo debe verse cada pantalla y estado (claro y oscuro).
-- `referencias/fuente/*.dc.html`: estilos exactos y textos finales.
+### Reglas
 
-En el código:
+- **Sensación:** tienda entre estudiantes, relajada y amigable. La foto del producto es la protagonista.
+- **Todo es "de hoy":** la hora límite siempre se ve. Una publicación es urgente cuando faltan ≤ 30 min: chip mango con cuenta regresiva en vivo (`ChipFaltan`). Poco stock (≤ 2) también va en mango.
+- **Colores:** la urgencia se comunica con **mango**, nunca con rojo. El rojo (`error`) es solo para errores reales: sin red, pedido rechazado, ocultar publicación.
+- **Forma:** esquinas muy redondeadas, botones y chips en pastilla (`rounded-full`), sombras suaves (`shadow-tarjeta`) en lugar de bordes. Botón principal de 56 px de alto; todo lo tocable ≥ 44 px.
+- **Tipografía:** Gabarito (`font-display`) para títulos, precios y horas (con `num` para números tabulares); Figtree para el resto. Monoespaciada solo en el código de verificación.
+- **Tono:** directo y cercano, como habla un estudiante. Nada de marketing ("¡Descubre…!") ni "Bienvenido de nuevo".
+- **Evitar:** bordes duros, esquinas rectas, degradados morados, glassmorphism y emojis como iconos.
 
-- Tokens de Tailwind v4 en `apps/web/src/styles/shopsito.css` (copia de `referencias/tokens/shopsito.css`). Usa las clases del tema (`bg-azul`, `text-sobre-azul`, `bg-mango-50`, `rounded-tarjeta`, `shadow-tarjeta`, `num`…), no colores sueltos.
-- Componentes base en `apps/web/src/components/` (`Tarjeta`, `ChipHora`, `PastillaEstado`, `Insignia`, `SelectorCantidad`, `BarraAccion`, `NavInferior`, `Skeleton`…). Reúsalos antes de crear uno nuevo.
-- Iconos con `lucide-react` (trazo 2, 17–22 px). Nunca emojis.
+### En el código
+
+- Tokens de Tailwind v4 en `apps/web/src/styles/shopsito.css`. Usa las clases del tema (`bg-azul`, `text-sobre-azul`, `bg-mango-50`, `rounded-tarjeta`, `shadow-tarjeta`, `num`…), no colores sueltos.
+- Componentes base en `apps/web/src/components/` (`Tarjeta`, `ChipHora`, `PastillaEstado`, `Insignia`, `SelectorCantidad`, `BarraAccion`, `NavInferior`, `NavSuperior`, `Skeleton`…). Reúsalos antes de crear uno nuevo.
+- Iconos con `lucide-react` (trazo 2, 17–22 px).
 - Modo oscuro con `data-theme="oscuro"` en `<html>` (se cambia en tu perfil). Sobre `bg-azul` usa `text-sobre-azul`, nunca `text-white`.
-- **Responsive.** El diseño viene en móvil (390 px); en pantallas grandes se extiende con prefijos de Tailwind:
-  - celular (< 768 px): columna única y navegación inferior flotante (`NavInferior`);
-  - tablet y computadora (`md:` ≥ 768 px, `lg:` ≥ 1024 px): navegación superior (`NavSuperior`), contenido hasta 1152 px, catálogo de 3 a 5 columnas y pantallas en dos columnas. `BarraAccion` es fija abajo en celular y una tarjeta normal en computadora;
-  - acceso (`LayoutAcceso`): panel de marca a la izquierda desde `lg:`.
-    Diseña primero para celular y agrega los `md:`/`lg:` después.
+- **Responsive:** diseña primero para celular y agrega los `md:`/`lg:` después.
+  - Celular (< 768 px): columna única y navegación inferior flotante (`NavInferior`).
+  - Tablet y computadora (`md:` ≥ 768 px, `lg:` ≥ 1024 px): navegación superior (`NavSuperior`), contenido hasta 1152 px, catálogo de 3 a 5 columnas y pantallas en dos columnas. `BarraAccion` es fija abajo en celular y una tarjeta normal en computadora.
+  - Acceso (`LayoutAcceso`): panel de marca a la izquierda desde `lg:`.
 - Las pantallas cuya API aún responde 501 usan datos de ejemplo de `apps/web/src/lib/ejemplos.ts`, marcados con `TODO`.
-- No edites ni formatees `referencias/` (está en `.prettierignore`).
 
 ## Estructura del repo
 
