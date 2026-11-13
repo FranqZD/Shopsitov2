@@ -94,6 +94,11 @@ En el código:
 - Componentes base en `apps/web/src/components/` (`Tarjeta`, `ChipHora`, `PastillaEstado`, `Insignia`, `SelectorCantidad`, `BarraAccion`, `NavInferior`, `Skeleton`…). Reúsalos antes de crear uno nuevo.
 - Iconos con `lucide-react` (trazo 2, 17–22 px). Nunca emojis.
 - Modo oscuro con `data-theme="oscuro"` en `<html>` (se cambia en tu perfil). Sobre `bg-azul` usa `text-sobre-azul`, nunca `text-white`.
+- **Responsive.** El diseño viene en móvil (390 px); en pantallas grandes se extiende con prefijos de Tailwind:
+  - celular (< 768 px): columna única y navegación inferior flotante (`NavInferior`);
+  - tablet y computadora (`md:` ≥ 768 px, `lg:` ≥ 1024 px): navegación superior (`NavSuperior`), contenido hasta 1152 px, catálogo de 3 a 5 columnas y pantallas en dos columnas. `BarraAccion` es fija abajo en celular y una tarjeta normal en computadora;
+  - acceso (`LayoutAcceso`): panel de marca a la izquierda desde `lg:`.
+    Diseña primero para celular y agrega los `md:`/`lg:` después.
 - Las pantallas cuya API aún responde 501 usan datos de ejemplo de `apps/web/src/lib/ejemplos.ts`, marcados con `TODO`.
 - No edites ni formatees `referencias/` (está en `.prettierignore`).
 
