@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import './styles/shopsito.css';
+
+/* Oculta la barra de los carruseles horizontales sin perder el scroll. */
+@utility sin-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

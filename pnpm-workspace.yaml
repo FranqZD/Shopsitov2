@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Paquetes con scripts de instalación permitidos (binarios de workerd/esbuild).
+onlyBuiltDependencies:
+  - esbuild
+  - workerd
+  - sharp

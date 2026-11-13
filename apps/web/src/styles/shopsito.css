@@ -1,0 +1,161 @@
+/* Tokens de diseño de Shopsito (v0.3).
+   Las fuentes se cargan en index.html, no aquí. Si cambian los tokens, actualiza ambos. */
+
+@custom-variant dark (&:where([data-theme=oscuro], [data-theme=oscuro] *));
+
+@theme {
+  /* Superficies y texto */
+  --color-papel: #fafaf7; /* fondo de la app */
+  --color-tarjeta: #ffffff; /* tarjetas, hojas, inputs */
+  --color-tinta: #1b2333; /* texto principal */
+  --color-tinta-2: #5e6878; /* texto secundario (5.3:1) */
+
+  /* Azul ITESO (primario) */
+  --color-azul: #1f3a68; /* botón principal, nav activa, títulos */
+  --color-azul-50: #eaf0f8; /* chips, secciones, seleccionado */
+  --color-azul-100: #d5e1f0; /* bordes de inputs, avatares */
+  --color-sobre-azul: #ffffff; /* texto encima de bg-azul */
+  --color-banner: #1f3a68; /* banners que se quedan marino en ambos temas */
+
+  /* Mango (acento cálido: urgencia, destacados, insignia) */
+  --color-mango: #ffb547;
+  --color-sobre-mango: #1b2333; /* texto encima de bg-mango, ambos temas */
+  --color-mango-50: #fff3df;
+  --color-mango-tinta: #7a4a00; /* texto sobre mango-50 */
+
+  /* Estados */
+  --color-verde: #2f7d55; /* aceptado, entregado */
+  --color-verde-50: #e4f3ea;
+  --color-sobre-verde: #ffffff;
+  --color-error: #b3402f; /* SOLO errores reales y rechazos */
+  --color-error-50: #fcebe8;
+  --color-gris-50: #f1f2f4; /* deshabilitado, agotado, cancelado */
+  --color-estrella-off: #e3e6eb;
+
+  /* Tipografía */
+  --font-display: 'Gabarito', ui-rounded, sans-serif; /* títulos, precios, horas */
+  --font-sans: 'Figtree', system-ui, sans-serif; /* texto */
+  --font-mono: ui-monospace, Menlo, monospace; /* SOLO código de verificación */
+
+  /* Radios */
+  --radius-foto: 14px; /* foto dentro de tarjeta */
+  --radius-chico: 16px; /* inputs, thumbs, avisos */
+  --radius-tarjeta: 20px; /* tarjetas */
+  --radius-grande: 24px; /* tarjetas de resumen / panel */
+  --radius-hoja: 28px; /* barras inferiores, foto de detalle */
+  /* botones, chips y pastillas: rounded-full */
+
+  /* Sombras (sin bordes duros) */
+  --shadow-tarjeta: 0 1px 2px rgb(27 35 51 / 0.05), 0 8px 24px rgb(27 35 51 / 0.08);
+  --shadow-flotante: 0 2px 4px rgb(27 35 51 / 0.05), 0 12px 32px rgb(27 35 51 / 0.12);
+  --shadow-hoja: 0 -8px 28px rgb(27 35 51 / 0.08);
+
+  /* Animaciones */
+  --animate-pulso: pulso 1.2s ease-in-out infinite; /* punto de "se acaba pronto" */
+  --animate-rebote: rebote 0.45s ease-out; /* botón Pedir al cambiar cantidad */
+  --animate-salto: salto 0.3s ease-out; /* número de cantidad */
+  --animate-anillo: anillo 1.8s ease-in-out infinite; /* pedido nuevo del vendedor */
+  --animate-estrella: estrella 0.35s ease-out; /* estrella al calificar */
+  --animate-brillo: brillo 1.4s linear infinite; /* skeletons */
+}
+
+[data-theme='oscuro'] {
+  --color-papel: #10141c;
+  --color-tarjeta: #1a2130;
+  --color-tinta: #edf1f7;
+  --color-tinta-2: #a3adbe;
+  --color-azul: #a9c4f0; /* se aclara: texto y botones */
+  --color-azul-50: #1f2a3f;
+  --color-azul-100: #2c3b57;
+  --color-sobre-azul: #0f1e3a; /* texto oscuro sobre botón azul claro */
+  --color-mango-50: #382a14;
+  --color-mango-tinta: #ffcf85;
+  --color-verde: #7acba0;
+  --color-verde-50: #17312a;
+  --color-sobre-verde: #0e2a1d;
+  --color-error: #f2907f;
+  --color-error-50: #3a1f1c;
+  --color-gris-50: #262d3a;
+  --color-estrella-off: #3a4357;
+  --shadow-tarjeta: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+  /* mango, sobre-mango y banner no cambian */
+}
+
+@keyframes pulso {
+  50% {
+    transform: scale(0.55);
+    opacity: 0.45;
+  }
+}
+@keyframes rebote {
+  30% {
+    transform: scale(1.07);
+  }
+  55% {
+    transform: scale(0.96);
+  }
+  80% {
+    transform: scale(1.02);
+  }
+}
+@keyframes salto {
+  40% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes anillo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgb(255 181 71 / 0.55),
+      var(--shadow-tarjeta);
+  }
+  50% {
+    box-shadow:
+      0 0 0 8px rgb(255 181 71 / 0),
+      var(--shadow-tarjeta);
+  }
+}
+@keyframes estrella {
+  40% {
+    transform: scale(1.28) rotate(-8deg);
+  }
+}
+@keyframes brillo {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-papel font-sans text-tinta antialiased;
+  }
+}
+
+@utility num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-gris-50) 0%,
+    var(--color-papel) 50%,
+    var(--color-gris-50) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-brillo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
