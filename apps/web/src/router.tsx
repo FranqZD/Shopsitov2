@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { LayoutAdmin } from './components/LayoutAdmin'
-import { LayoutConNav, LayoutMovil } from './components/Layouts'
+import { LayoutAcceso, LayoutConNav, LayoutMovil } from './components/Layouts'
 import { AdminPuntosPage } from './pages/AdminPuntosPage'
 import { AdminReportesPage } from './pages/AdminReportesPage'
 import { CalificarPage } from './pages/CalificarPage'
@@ -39,10 +39,16 @@ export const router = createBrowserRouter([
       { path: '/calificar/:pedidoId', element: <CalificarPage /> },
       { path: '/perfil/:id', element: <PerfilPage /> },
       { path: '/notificaciones', element: <NotificacionesPage /> },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    // Acceso: sin navegación; en computadora lleva panel de marca.
+    element: <LayoutAcceso />,
+    children: [
       { path: '/login', element: <LoginPage /> },
       { path: '/registro', element: <RegistroPage /> },
       { path: '/verificar', element: <VerificarPage /> },
-      { path: '*', element: <NotFoundPage /> },
     ],
   },
   {
