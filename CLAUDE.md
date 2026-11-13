@@ -79,6 +79,7 @@ Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts
 - Ramas desde `main`: `feature/SH-XX-descripcion` y `fix/descripcion`.
 - Commits pequeños con Conventional Commits en español: `feat(api): …`, `fix(web): …`, `chore: …`, `docs: …`, `test: …`.
 - No hacer push ni abrir PR salvo que se pida.
+- Sin líneas de atribución: nada de `Co-Authored-By: Claude…` ni "Generated with Claude Code" en commits ni PRs.
 
 ## Cuidado con
 
