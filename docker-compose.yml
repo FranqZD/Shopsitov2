@@ -1,28 +1,18 @@
-# Uso sin VS Code:  docker compose up
-# Primera vez instala dependencias, aplica migraciones, corre el seed y levanta web + api.
+# docker compose up → instala dependencias, migra, siembra y levanta web (5173) + api (8787).
 services:
   dev:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    command: bash -c "bash docker/setup.sh && pnpm dev"
-    ports:
-      - '5173:5173' # web (Vite)
-      - '8787:8787' # api (Wrangler)
+    build: .devcontainer # node:24 slim + certificados raíz
+    working_dir: /workspace
+    command: sh -c "corepack enable && pnpm preparar && pnpm dev"
+    ports: ['5173:5173', '8787:8787']
     environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      npm_config_store_dir: /workspace/node_modules/.pnpm-store # mismo volumen = hardlinks
       VITE_USE_POLLING: '1'
+      WRANGLER_SEND_METRICS: 'false'
     volumes:
-      - .:/workspace:cached
-      # node_modules en volúmenes nombrados: no se mezclan binarios de macOS/Windows con los de Linux.
-      - node_modules:/workspace/node_modules
-      - node_modules_web:/workspace/apps/web/node_modules
-      - node_modules_api:/workspace/apps/api/node_modules
-      - node_modules_shared:/workspace/packages/shared/node_modules
-      # El estado local de Wrangler (D1 y R2 simulados) vive en apps/api/.wrangler,
-      # dentro del bind mount, así que persiste entre reinicios (y está en .gitignore).
+      - .:/workspace
+      - node_modules:/workspace/node_modules # binarios de Linux separados de los del host
 
 volumes:
   node_modules:
-  node_modules_web:
-  node_modules_api:
-  node_modules_shared:

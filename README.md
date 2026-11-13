@@ -25,7 +25,7 @@ Solo necesitas **Docker** (Docker Desktop en Mac/Windows). No instales Node en t
 
 1. Instala la extensión **Dev Containers**.
 2. Abre la carpeta del repo → `Dev Containers: Reopen in Container`.
-3. La primera vez se ejecuta `docker/setup.sh` (instala dependencias, aplica migraciones y corre el seed). Tarda unos minutos.
+3. La primera vez se ejecuta `pnpm preparar` (instala dependencias, aplica migraciones y corre el seed). Tarda unos minutos.
 4. En la terminal del contenedor: `pnpm dev`.
 
 ### Opción B: docker compose (sin VS Code)
@@ -60,23 +60,26 @@ También hay vendedores de ejemplo del diseño (`mariana@`, `diego@`, `fernanda@
 
 ### Notas del entorno Docker
 
-- `node_modules` vive en volúmenes nombrados, así no se mezclan binarios de tu sistema con los de Linux. Si algo se rompe: `docker compose down -v` y vuelve a levantar.
+- La imagen es la oficial `node:24-bookworm-slim` más los certificados raíz (`.devcontainer/Dockerfile`, 3 líneas). Debian y no Alpine porque `workerd` necesita glibc.
+- `node_modules` de la raíz vive en un volumen nombrado, así no se mezclan binarios de tu sistema con los de Linux. Si algo se rompe: `docker compose down -v` y vuelve a levantar.
+- El contenedor no trae git: haz commits desde tu máquina (o desde la terminal de VS Code fuera del contenedor).
 - El estado local de D1/R2 está en `apps/api/.wrangler/` (ignorado por git) y persiste entre reinicios. Bórralo para empezar desde cero.
 - Los secretos locales están en `apps/api/.dev.vars` (se crea a partir de `.dev.vars.example`; nunca se sube).
 
 ## Scripts (raíz)
 
-| Comando            | Qué hace                                                         |
-| ------------------ | ---------------------------------------------------------------- |
-| `pnpm dev`         | Levanta web (5173) y api (8787)                                  |
-| `pnpm build`       | Build de web y bundle de la api (`wrangler deploy --dry-run`)    |
-| `pnpm lint`        | ESLint en todo el repo                                           |
-| `pnpm format`      | Prettier en todo el repo                                         |
-| `pnpm typecheck`   | `tsc` en cada paquete                                            |
-| `pnpm test`        | Vitest en cada paquete                                           |
-| `pnpm db:generate` | Genera una migración SQL a partir de `apps/api/src/db/schema.ts` |
-| `pnpm db:migrate`  | Aplica migraciones a la D1 **local**                             |
-| `pnpm db:seed`     | Resetea y siembra la D1 local                                    |
+| Comando            | Qué hace                                                                |
+| ------------------ | ----------------------------------------------------------------------- |
+| `pnpm preparar`    | Instala dependencias, crea `.dev.vars`, migra y siembra (lo usa Docker) |
+| `pnpm dev`         | Levanta web (5173) y api (8787)                                         |
+| `pnpm build`       | Build de web y bundle de la api (`wrangler deploy --dry-run`)           |
+| `pnpm lint`        | ESLint en todo el repo                                                  |
+| `pnpm format`      | Prettier en todo el repo                                                |
+| `pnpm typecheck`   | `tsc` en cada paquete                                                   |
+| `pnpm test`        | Vitest en cada paquete                                                  |
+| `pnpm db:generate` | Genera una migración SQL a partir de `apps/api/src/db/schema.ts`        |
+| `pnpm db:migrate`  | Aplica migraciones a la D1 **local**                                    |
+| `pnpm db:seed`     | Resetea y siembra la D1 local                                           |
 
 Si cambias `wrangler.toml`, regenera los tipos del runtime con `pnpm --filter @shopsito/api cf-typegen`.
 
@@ -110,8 +113,7 @@ El diseño que ya está en la app es la referencia: tokens, componentes base y p
 
 ```
 .
-├── .devcontainer/          # Dockerfile (Node 24, Debian) y devcontainer.json
-├── docker/setup.sh         # instala deps, migra y siembra (lo usan devcontainer y compose)
+├── .devcontainer/          # Dockerfile mínimo (Node 24 slim + certificados) y devcontainer.json
 ├── docker-compose.yml
 ├── apps/
 │   ├── api/

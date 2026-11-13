@@ -7,6 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "preparar": "cp -n apps/api/.dev.vars.example apps/api/.dev.vars; pnpm install --frozen-lockfile && pnpm db:migrate && pnpm db:seed",
     "dev": "pnpm --parallel --filter @shopsito/api --filter @shopsito/web dev",
     "build": "pnpm -r build",
     "lint": "eslint .",

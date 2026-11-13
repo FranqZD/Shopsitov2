@@ -35,9 +35,7 @@ Sin Docker (p. ej. una sesión en la nube con Node ≥ 24 y Linux/glibc):
 
 ```bash
 corepack enable
-pnpm install
-cp -n apps/api/.dev.vars.example apps/api/.dev.vars
-pnpm db:migrate && pnpm db:seed
+pnpm preparar   # install + .dev.vars + migraciones + seed
 pnpm dev
 ```
 
@@ -47,7 +45,7 @@ Usuarios del seed: `admin@shopsito.test` / `admin1234` (admin); `ana@`, `beto@`,
 
 ## Comandos (raíz)
 
-`pnpm dev` · `pnpm build` · `pnpm lint` · `pnpm format` · `pnpm typecheck` · `pnpm test` · `pnpm db:generate` · `pnpm db:migrate` · `pnpm db:seed`
+`pnpm preparar` · `pnpm dev` · `pnpm build` · `pnpm lint` · `pnpm format` · `pnpm typecheck` · `pnpm test` · `pnpm db:generate` · `pnpm db:migrate` · `pnpm db:seed`
 
 Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck && pnpm test` (y `pnpm build` si tocaste config). Todo debe pasar.
 
