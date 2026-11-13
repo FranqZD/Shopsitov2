@@ -48,13 +48,15 @@ docker compose exec dev bash   # shell interactiva
 
 ### Usuarios del seed
 
-| Correo                | Contraseña    | Rol                       |
-| --------------------- | ------------- | ------------------------- |
-| `admin@shopsito.test` | `admin1234`   | admin                     |
-| `ana@shopsito.test`   | `shopsito123` | usuario (con insignia 🎓) |
-| `beto@shopsito.test`  | `shopsito123` | usuario                   |
+| Correo                | Contraseña    | Rol                    |
+| --------------------- | ------------- | ---------------------- |
+| `admin@shopsito.test` | `admin1234`   | admin                  |
+| `ana@shopsito.test`   | `shopsito123` | usuario (con insignia) |
+| `beto@shopsito.test`  | `shopsito123` | usuario                |
 
-`pnpm db:seed` **borra** los datos locales y vuelve a crearlos (con productos de la fecha de hoy).
+También hay vendedores de ejemplo del diseño (`mariana@`, `diego@`, `fernanda@`, `jorge@`, `paola@`, `andrea@`, `sofia@`, `luis@` `shopsito.test`, todos con `shopsito123`).
+
+`pnpm db:seed` **borra** los datos locales y vuelve a crearlos. Las horas límite se calculan a partir de la hora en que lo corres (la primera cierra en 18 min), así que si ya no ves productos o contadores, vuelve a correrlo.
 
 ### Notas del entorno Docker
 
@@ -77,6 +79,23 @@ docker compose exec dev bash   # shell interactiva
 | `pnpm db:seed`     | Resetea y siembra la D1 local                                    |
 
 Si cambias `wrangler.toml`, regenera los tipos del runtime con `pnpm --filter @shopsito/api cf-typegen`.
+
+## Diseño del frontend
+
+El diseño aprobado está en [`referencias/`](referencias/) y es la **fuente de verdad** del frontend:
+
+- [`referencias/DESIGN.md`](referencias/DESIGN.md): principios, tokens, componentes, pantallas y reglas (urgencia con mango, nunca con rojo; textos finales; etc.).
+- `referencias/pantallas/*.png`: cómo debe verse cada pantalla y estado (claro y oscuro).
+- `referencias/fuente/*.dc.html`: estilos exactos y textos finales.
+
+En el código:
+
+- Tokens de Tailwind v4 en `apps/web/src/styles/shopsito.css` (copia de `referencias/tokens/shopsito.css`). Usa las clases del tema (`bg-azul`, `text-sobre-azul`, `bg-mango-50`, `rounded-tarjeta`, `shadow-tarjeta`, `num`…), no colores sueltos.
+- Componentes base en `apps/web/src/components/` (`Tarjeta`, `ChipHora`, `PastillaEstado`, `Insignia`, `SelectorCantidad`, `BarraAccion`, `NavInferior`, `Skeleton`…). Reúsalos antes de crear uno nuevo.
+- Iconos con `lucide-react` (trazo 2, 17–22 px). Nunca emojis.
+- Modo oscuro con `data-theme="oscuro"` en `<html>` (se cambia en tu perfil). Sobre `bg-azul` usa `text-sobre-azul`, nunca `text-white`.
+- Las pantallas cuya API aún responde 501 usan datos de ejemplo de `apps/web/src/lib/ejemplos.ts`, marcados con `TODO`.
+- No edites ni formatees `referencias/` (está en `.prettierignore`).
 
 ## Estructura del repo
 
@@ -143,12 +162,13 @@ Si cambias `wrangler.toml`, regenera los tipos del runtime con `pnpm --filter @s
 - `/api/puntos-entrega`: CRUD completo (lectura pública; crear/editar/borrar solo admin)
 - `POST /api/auth/login` (mínimo, para probar rutas protegidas) y `POST /api/auth/logout` (sin estado)
 - Middleware JWT (`requireAuth`, `requireAdmin`), validación Zod y errores centralizados
-- Web: `/` muestra los productos de hoy; `/admin` lista y administra puntos de entrega; `/login` funciona
+- Web con el diseño aprobado. Con datos reales: catálogo (`/`), detalle (`/producto/:id`), confirmar (puntos de entrega reales), entrar (`/login`) y admin de puntos de entrega (`/admin`)
 
 **Stub (`501 Not Implemented`, con validación ya conectada)**
 
 - auth: registro, verificación de código, correo institucional
 - usuarios, resto de productos (detalle, crear, editar, borrar, foto en R2), pedidos, calificaciones, notificaciones, reportes
-- Páginas web: producto, registro, verificar, vender, pedidos, perfil
+- Pantallas web con datos de ejemplo (`lib/ejemplos.ts`) hasta que exista su API: mis pedidos y detalle, calificar, vender y mis ventas, perfil (reseñas y estadísticas), notificaciones, reportes de admin. Registro, verificar, publicar y confirmar pedido ya llaman a la API y muestran su respuesta 501.
+- Datos que el diseño muestra pero la API aún no tiene: categoría del producto, cantidad inicial (barra "Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido y método de pago.
 
 **Fuera de alcance por ahora**: notificaciones en tiempo real (hay un TODO), Terraform, CI y recursos en la nube.

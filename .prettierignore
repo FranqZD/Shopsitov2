@@ -3,3 +3,4 @@ dist
 .wrangler
 apps/api/migrations
 apps/api/worker-configuration.d.ts
+referencias
