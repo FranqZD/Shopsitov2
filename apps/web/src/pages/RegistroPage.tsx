@@ -31,7 +31,7 @@ export function RegistroPage() {
   const nivel = fuerza(password)
 
   return (
-    <main className="flex min-h-dvh flex-col px-6 pt-3.5 pb-[26px]">
+    <main className="flex min-h-dvh flex-col px-6 pt-3.5 pb-[26px] lg:min-h-0">
       <div className="-ml-2">
         <BotonRedondo to="/login" label="Regresar">
           <ChevronLeft size={22} strokeWidth={2.2} />

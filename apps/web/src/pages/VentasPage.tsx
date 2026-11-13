@@ -48,8 +48,8 @@ export function VentasPage() {
   const ganado = entregados.reduce((a, o) => a + o.total, 0)
 
   return (
-    <main className="flex flex-col gap-6 px-5 pt-3.5">
-      <div className="-ml-1 flex items-center gap-3">
+    <main className="flex flex-col gap-6 px-5 pt-3.5 md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-start md:gap-x-6">
+      <div className="-ml-1 flex items-center gap-3 md:col-span-2">
         <BotonRedondo to="/vender" label="Regresar a vender">
           <ChevronLeft size={22} strokeWidth={2.2} />
         </BotonRedondo>
@@ -58,7 +58,7 @@ export function VentasPage() {
         </h1>
       </div>
 
-      <div className="relative flex items-center overflow-hidden rounded-grande bg-banner px-6 py-5 text-white">
+      <div className="relative flex items-center overflow-hidden rounded-grande bg-banner px-6 py-5 text-white md:col-span-2 md:px-8 md:py-7">
         <span className="absolute -right-10 -bottom-16 size-[200px] rounded-full bg-white/18" />
         <div className="relative flex flex-1 flex-col gap-0.5">
           <span className="text-[15px] text-[#D5E1F0]">Hoy llevas</span>
@@ -75,7 +75,7 @@ export function VentasPage() {
       </div>
 
       {nuevo === 'pendiente' && (
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3 md:col-start-1">
           <h2 className="flex items-center gap-2.5 font-display text-[21px] font-bold tracking-[-0.01em]">
             <span className="size-2.5 animate-pulso rounded-full bg-mango" />
             Pedido nuevo
@@ -125,13 +125,13 @@ export function VentasPage() {
       {nuevo === 'rechazado' && (
         <div
           role="status"
-          className="rounded-chico bg-gris-50 px-4 py-3.5 text-[14.5px] leading-normal"
+          className="rounded-chico bg-gris-50 px-4 py-3.5 text-[14.5px] leading-normal md:col-start-1"
         >
           Rechazaste el pedido de {nombreCorto(n.comprador)}. Ya le avisamos y no se le cobra nada.
         </div>
       )}
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 md:col-start-1">
         <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">
           Por entregar <span className="text-base text-tinta-2">{pendientes.length}</span>
         </h2>
@@ -165,7 +165,7 @@ export function VentasPage() {
         ))}
       </section>
 
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-2 md:col-start-2 md:row-span-3 md:row-start-3">
         <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">Entregados hoy</h2>
         {entregados.map((o, i) => (
           <div

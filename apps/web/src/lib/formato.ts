@@ -14,6 +14,14 @@ export function formatoCuenta(segundos: number) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
+/** "48 min" o "2 h 13 min" para tiempos largos (las cuentas mm:ss solo van en los últimos 30 min). */
+export function formatoFaltan(segundos: number) {
+  const min = Math.max(0, Math.round(segundos / 60))
+  if (min < 60) return `${min} min`
+  const h = Math.floor(min / 60)
+  return min % 60 ? `${h} h ${min % 60} min` : `${h} h`
+}
+
 /** Iniciales para avatares sin foto: "Mariana López" → "ML". */
 export function iniciales(nombre: string) {
   const partes = nombre.trim().split(/\s+/)

@@ -10,7 +10,7 @@ import { SEGUNDOS_URGENTE } from '../components/ChipHora'
 import { FotoProducto } from '../components/FotoProducto'
 import { Insignia, SinVerificar } from '../components/Insignia'
 import { SelectorCantidad } from '../components/SelectorCantidad'
-import { formatoCuenta, formatoPrecio, nombreCorto } from '../lib/formato'
+import { formatoCuenta, formatoFaltan, formatoPrecio, nombreCorto } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
 import { useAhora } from '../lib/useAhora'
 import { useProductosHoy } from '../lib/useProductosHoy'
@@ -43,9 +43,9 @@ export function DetallePage() {
 
   return (
     <>
-      <main className="flex flex-col pb-[130px]">
-        <div className="relative">
-          <div className="h-[404px] overflow-hidden rounded-b-[32px]">
+      <main className="flex flex-col pb-[130px] md:grid md:grid-cols-2 md:items-start md:gap-10 md:px-5 md:pt-4 md:pb-0 lg:gap-14">
+        <div className="relative md:sticky md:top-28">
+          <div className="h-[404px] overflow-hidden rounded-b-[32px] md:aspect-[4/5] md:h-auto md:rounded-hoja">
             <FotoProducto
               url={urlFoto(p.fotoKey)}
               alt={p.nombre}
@@ -86,15 +86,15 @@ export function DetallePage() {
                 ? '· por hoy'
                 : urgente
                   ? `· hasta ${p.horaLimite}`
-                  : `· faltan ${Math.round(restante / 60)} min`}
+                  : `· faltan ${formatoFaltan(restante)}`}
             </span>
           </span>
         </div>
 
-        <div className="flex flex-col gap-[18px] px-5 pt-10 pb-5">
+        <div className="flex flex-col gap-[18px] px-5 pt-10 pb-5 md:px-0 md:pt-6">
           <div className="flex flex-col gap-2.5">
             {/* TODO: pastilla de categoría y "Publicado a las 7:42" cuando la API tenga esos datos. */}
-            <h1 className="font-display text-[29px] leading-[1.08] font-bold tracking-[-0.015em]">
+            <h1 className="font-display text-[29px] leading-[1.08] font-bold tracking-[-0.015em] md:text-[38px]">
               {p.nombre}
             </h1>
             {p.descripcion && (
@@ -148,43 +148,42 @@ export function DetallePage() {
               <span className="text-[13.5px] leading-[1.4]">Eliges el punto al confirmar.</span>
             </div>
           </div>
+          <BarraAccion>
+            {agotado ? (
+              <div className="flex flex-col gap-1">
+                <Boton variante="gris" disabled className="w-full text-base">
+                  Se acabó por hoy
+                </Boton>
+                <Link
+                  to={`/perfil/${p.vendedor.id}`}
+                  className="flex h-11 items-center self-center text-[14.5px] font-bold text-azul"
+                >
+                  Ver qué más vende {corto} hoy
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5">
+                <SelectorCantidad
+                  valor={q}
+                  max={p.cantidad}
+                  onChange={(n) => {
+                    setCantidad(n)
+                    setRebote((r) => r + 1)
+                  }}
+                />
+                <Boton
+                  key={rebote}
+                  className={`flex-1 ${rebote ? 'animate-rebote' : ''}`}
+                  onClick={() => navigate(`/producto/${p.id}/confirmar?cantidad=${q}`)}
+                >
+                  <ShoppingBag size={19} strokeWidth={2.1} aria-hidden="true" />
+                  Pedir {q} · <span className="num">{formatoPrecio(p.precio * q)}</span>
+                </Boton>
+              </div>
+            )}
+          </BarraAccion>
         </div>
       </main>
-
-      <BarraAccion>
-        {agotado ? (
-          <div className="flex flex-col gap-1">
-            <Boton variante="gris" disabled className="w-full text-base">
-              Se acabó por hoy
-            </Boton>
-            <Link
-              to={`/perfil/${p.vendedor.id}`}
-              className="flex h-11 items-center self-center text-[14.5px] font-bold text-azul"
-            >
-              Ver qué más vende {corto} hoy
-            </Link>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2.5">
-            <SelectorCantidad
-              valor={q}
-              max={p.cantidad}
-              onChange={(n) => {
-                setCantidad(n)
-                setRebote((r) => r + 1)
-              }}
-            />
-            <Boton
-              key={rebote}
-              className={`flex-1 ${rebote ? 'animate-rebote' : ''}`}
-              onClick={() => navigate(`/producto/${p.id}/confirmar?cantidad=${q}`)}
-            >
-              <ShoppingBag size={19} strokeWidth={2.1} aria-hidden="true" />
-              Pedir {q} · <span className="num">{formatoPrecio(p.precio * q)}</span>
-            </Boton>
-          </div>
-        )}
-      </BarraAccion>
     </>
   )
 }

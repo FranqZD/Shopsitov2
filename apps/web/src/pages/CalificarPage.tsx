@@ -27,7 +27,7 @@ export function CalificarPage() {
   const corto = nombreCorto(pedido.vendedor.nombre)
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col md:mx-auto md:min-h-0 md:max-w-xl md:pt-4">
       <main className="flex flex-1 flex-col px-6 pt-3.5">
         <div className="-ml-2">
           <BotonRedondo to="/pedidos" label="Cerrar">

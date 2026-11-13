@@ -73,7 +73,7 @@ export function CatalogoPage() {
       <div className="flex items-start justify-between px-5 pt-[18px]">
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-tinta-2">{saludo(hora)}</span>
-          <h1 className="font-display text-[27px] leading-[1.1] font-bold tracking-[-0.015em] text-azul">
+          <h1 className="font-display text-[27px] leading-[1.1] font-bold tracking-[-0.015em] text-azul md:text-[34px]">
             {tituloHoy(fecha)}
           </h1>
           <span className="text-sm text-tinta-2">{subtitulo}</span>
@@ -81,7 +81,7 @@ export function CatalogoPage() {
         <Link
           to="/notificaciones"
           aria-label={SIN_LEER ? `Notificaciones, ${SIN_LEER} sin leer` : 'Notificaciones'}
-          className="relative flex size-[46px] flex-none items-center justify-center rounded-full bg-tarjeta text-azul shadow-tarjeta"
+          className="relative flex size-[46px] flex-none items-center justify-center rounded-full bg-tarjeta text-azul shadow-tarjeta md:hidden"
         >
           <Bell size={21} strokeWidth={1.9} aria-hidden="true" />
           {SIN_LEER > 0 && (
@@ -90,7 +90,7 @@ export function CatalogoPage() {
         </Link>
       </div>
 
-      <div className="px-5 pt-[18px]">
+      <div className="px-5 pt-[18px] md:max-w-xl">
         <label className="flex h-[50px] items-center gap-2.5 rounded-full bg-tarjeta px-[18px] text-tinta-2 shadow-tarjeta focus-within:ring-2 focus-within:ring-azul/30">
           <Search size={19} strokeWidth={2} aria-hidden="true" />
           <span className="sr-only">Buscar en lo de hoy</span>
@@ -106,10 +106,10 @@ export function CatalogoPage() {
 
       {lleno && (
         <div className="px-5 pt-[18px]">
-          <div className="relative flex items-center gap-3.5 overflow-hidden rounded-grande bg-banner py-[18px] pr-[18px] pl-5 text-white">
+          <div className="relative flex items-center gap-3.5 overflow-hidden rounded-grande bg-banner py-[18px] pr-[18px] pl-5 text-white md:py-6 md:pr-6 md:pl-8">
             <span className="absolute -top-[30px] -right-[26px] size-[120px] rounded-full bg-mango/16" />
             <div className="relative flex flex-1 flex-col gap-1">
-              <span className="font-display text-[19px] leading-[1.15] font-bold">
+              <span className="font-display text-[19px] leading-[1.15] font-bold md:text-2xl">
                 ¿Trajiste algo para vender?
               </span>
               <span className="text-sm text-[#D5E1F0]">Publícalo en 1 minuto.</span>
@@ -151,7 +151,7 @@ export function CatalogoPage() {
               <ProntoSkeleton key={k} />
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-3.5 px-5 pt-[26px]">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3.5 px-5 pt-[26px] md:grid-cols-3 md:gap-x-4 md:gap-y-5 lg:grid-cols-4 xl:grid-cols-5">
             {[1, 2, 3, 4].map((k) => (
               <TarjetaSkeleton key={k} />
             ))}
@@ -160,7 +160,7 @@ export function CatalogoPage() {
       )}
 
       {estado.tipo === 'error' && (
-        <section role="alert" className="px-5 pt-[22px]">
+        <section role="alert" className="px-5 pt-[22px] md:mx-auto md:w-full md:max-w-lg">
           <div className="flex flex-col items-center gap-3 rounded-hoja bg-tarjeta px-6 pt-7 pb-6 text-center shadow-tarjeta">
             <div className="flex size-[72px] items-center justify-center rounded-full bg-error-50 text-error">
               <WifiOff size={32} strokeWidth={1.9} aria-hidden="true" />
@@ -184,7 +184,7 @@ export function CatalogoPage() {
       )}
 
       {estado.tipo === 'listo' && productos.length === 0 && (
-        <section className="px-5 pt-[22px]">
+        <section className="px-5 pt-[22px] md:mx-auto md:w-full md:max-w-lg">
           <div className="flex flex-col items-center gap-3 rounded-hoja bg-tarjeta px-6 pt-[30px] pb-[26px] text-center shadow-tarjeta">
             <div className="mb-1 flex size-[116px] items-center justify-center rounded-full bg-azul-50">
               <svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true">
@@ -240,9 +240,9 @@ export function CatalogoPage() {
                     <Link
                       key={p.id}
                       to={`/producto/${p.id}`}
-                      className="flex w-[156px] flex-none flex-col gap-2 rounded-tarjeta bg-tarjeta px-1.5 pt-1.5 pb-3 text-tinta shadow-tarjeta"
+                      className="flex w-[156px] flex-none flex-col gap-2 rounded-tarjeta bg-tarjeta px-1.5 pt-1.5 pb-3 text-tinta shadow-tarjeta md:w-[200px]"
                     >
-                      <div className="relative h-36 overflow-hidden rounded-[15px]">
+                      <div className="relative h-36 overflow-hidden rounded-[15px] md:h-44">
                         <FotoProducto url={urlFoto(p.fotoKey)} className="size-full" />
                         <span className="absolute bottom-2 left-2">
                           {s <= SEGUNDOS_URGENTE ? (
@@ -277,7 +277,7 @@ export function CatalogoPage() {
                 {lista.length ? cosas(lista.length) : 'Nada con esa búsqueda'}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-3.5">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3.5 md:grid-cols-3 md:gap-x-4 md:gap-y-5 lg:grid-cols-4 xl:grid-cols-5">
               {lista.map((p) => (
                 <Tarjeta
                   key={p.id}

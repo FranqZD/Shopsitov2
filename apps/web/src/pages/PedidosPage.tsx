@@ -23,20 +23,20 @@ export function PedidosPage() {
   )
 
   return (
-    <main className="flex flex-col px-5 pt-5">
+    <main className="flex flex-col px-5 pt-5 md:mx-auto md:max-w-4xl">
       <h1 className="font-display text-[28px] font-bold tracking-[-0.015em] text-azul">
         Mis pedidos
       </h1>
       <div
         role="tablist"
         aria-label="Pedidos"
-        className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-azul-50 p-1"
+        className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-azul-50 p-1 md:max-w-sm"
       >
         {tab('activos', `Activos · ${activos.length}`)}
         {tab('anteriores', 'Anteriores')}
       </div>
 
-      <div className="mt-[18px] flex flex-col gap-3">
+      <div className="mt-[18px] flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start">
         {lista.map((o) => {
           const apagado = o.estado === 'rechazado' || o.estado === 'cancelado'
           return (

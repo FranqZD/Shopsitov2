@@ -79,7 +79,7 @@ export function PedidoDetallePage() {
 
   return (
     <>
-      <main className="flex flex-col gap-4 px-5 pt-3.5 pb-[130px]">
+      <main className="flex flex-col gap-4 px-5 pt-3.5 pb-[130px] md:pb-0">
         <div className="-ml-1 flex items-center gap-3">
           <BotonRedondo to="/pedidos" label="Regresar a mis pedidos">
             <ChevronLeft size={22} strokeWidth={2.2} />
@@ -92,108 +92,112 @@ export function PedidoDetallePage() {
           </div>
         </div>
 
-        <div className={`flex flex-col gap-2 rounded-grande p-5 ${hero.fondo}`}>
-          <div className="flex items-center gap-3">
-            <span
-              className={`flex size-11 flex-none items-center justify-center rounded-full ${hero.icono}`}
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,1fr)_380px] md:items-start md:gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="flex flex-col gap-4">
+            <div className={`flex flex-col gap-2 rounded-grande p-5 ${hero.fondo}`}>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex size-11 flex-none items-center justify-center rounded-full ${hero.icono}`}
+                >
+                  {d.estado === 'pendiente' && <Clock size={22} strokeWidth={2.2} />}
+                  {(d.estado === 'aceptado' || d.estado === 'entregado') && (
+                    <Check size={22} strokeWidth={2.6} />
+                  )}
+                  {(d.estado === 'rechazado' || d.estado === 'cancelado') && (
+                    <X size={22} strokeWidth={2.4} />
+                  )}
+                </span>
+                <h2
+                  className={`font-display text-[23px] leading-[1.15] font-bold tracking-[-0.01em] ${hero.titulo}`}
+                >
+                  {d.titulo}
+                </h2>
+              </div>
+              <p className="text-[15px] leading-normal">{d.texto}</p>
+              {d.mensaje && (
+                <p className="mt-1 rounded-chico bg-tarjeta px-3.5 py-3 text-[14.5px] leading-[1.45] italic">
+                  “{d.mensaje}” <span className="text-tinta-2 not-italic">— {corto}</span>
+                </p>
+              )}
+              {d.estado === 'pendiente' && (
+                <span className="mt-1.5 inline-flex h-[34px] items-center gap-2 self-start rounded-full bg-mango pr-3.5 pl-3 text-sm font-bold text-[#1B2333] tabular-nums">
+                  <span className="size-2 animate-pulso rounded-full bg-[#1B2333]" />
+                  Tiene {formatoCuenta(restante)} para aceptarlo
+                </span>
+              )}
+            </div>
+
+            <section
+              aria-label="Seguimiento"
+              className="rounded-grande bg-tarjeta px-5 pt-5 pb-2 shadow-tarjeta"
             >
-              {d.estado === 'pendiente' && <Clock size={22} strokeWidth={2.2} />}
-              {(d.estado === 'aceptado' || d.estado === 'entregado') && (
-                <Check size={22} strokeWidth={2.6} />
+              {d.pasos.map((paso, i) => (
+                <Paso key={paso.titulo} paso={paso} ultimo={i === d.pasos.length - 1} />
+              ))}
+            </section>
+          </div>
+          <div className="flex flex-col gap-4 md:sticky md:top-28">
+            <div className="flex flex-col gap-3.5 rounded-grande bg-tarjeta p-3.5 shadow-tarjeta">
+              <div className="flex items-center gap-3">
+                <img
+                  src={d.foto}
+                  alt=""
+                  className="size-[60px] flex-none rounded-[15px] object-cover"
+                />
+                <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+                  <span className="text-[15px] font-bold">{d.producto}</span>
+                  <span className="text-[13px] text-tinta-2">
+                    {d.cantidad} × {formatoPrecio(d.precio)}
+                  </span>
+                </div>
+                <span className="num text-xl font-bold">{formatoPrecio(total)}</span>
+              </div>
+              <Link
+                to={`/perfil/${d.vendedor.id}`}
+                className="flex items-center gap-2.5 rounded-chico bg-papel px-3 py-2.5 text-tinta"
+              >
+                <Avatar id={d.vendedor.id} nombre={d.vendedor.nombre} size={32} />
+                <span className="flex-1 text-sm font-semibold">{d.vendedor.nombre}</span>
+                <span className="text-[13.5px] font-bold text-azul">Ver perfil</span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-tarjeta bg-azul-50 py-3.5 pr-4 pl-3.5">
+              <span className="flex size-[42px] flex-none items-center justify-center rounded-full bg-tarjeta text-azul">
+                <MapPin size={20} strokeWidth={2} aria-hidden="true" />
+              </span>
+              <div className="flex flex-1 flex-col gap-0.5">
+                <span className="text-[14.5px] font-bold text-azul">{d.punto}</span>
+                <span className="text-[13.5px] leading-[1.4]">{d.puntoNota}</span>
+              </div>
+            </div>
+            <BarraAccion>
+              {d.estado === 'pendiente' && (
+                <Boton variante="gris" tamano="md" className="w-full">
+                  Cancelar pedido
+                </Boton>
+              )}
+              {d.estado === 'aceptado' && (
+                <div className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-verde-50 text-[15px] font-bold text-verde">
+                  <Banknote size={18} strokeWidth={2} aria-hidden="true" />
+                  Pagas {formatoPrecio(total)} en efectivo al recoger
+                </div>
+              )}
+              {d.estado === 'entregado' && (
+                <Boton to={`/calificar/${d.id}`} className="w-full">
+                  <Star size={18} fill="#FFB547" strokeWidth={0} aria-hidden="true" />
+                  Calificar a {corto}
+                </Boton>
               )}
               {(d.estado === 'rechazado' || d.estado === 'cancelado') && (
-                <X size={22} strokeWidth={2.4} />
+                <Boton to="/" className="w-full">
+                  Ver qué más hay hoy
+                </Boton>
               )}
-            </span>
-            <h2
-              className={`font-display text-[23px] leading-[1.15] font-bold tracking-[-0.01em] ${hero.titulo}`}
-            >
-              {d.titulo}
-            </h2>
-          </div>
-          <p className="text-[15px] leading-normal">{d.texto}</p>
-          {d.mensaje && (
-            <p className="mt-1 rounded-chico bg-tarjeta px-3.5 py-3 text-[14.5px] leading-[1.45] italic">
-              “{d.mensaje}” <span className="text-tinta-2 not-italic">— {corto}</span>
-            </p>
-          )}
-          {d.estado === 'pendiente' && (
-            <span className="mt-1.5 inline-flex h-[34px] items-center gap-2 self-start rounded-full bg-mango pr-3.5 pl-3 text-sm font-bold text-[#1B2333] tabular-nums">
-              <span className="size-2 animate-pulso rounded-full bg-[#1B2333]" />
-              Tiene {formatoCuenta(restante)} para aceptarlo
-            </span>
-          )}
-        </div>
-
-        <section
-          aria-label="Seguimiento"
-          className="rounded-grande bg-tarjeta px-5 pt-5 pb-2 shadow-tarjeta"
-        >
-          {d.pasos.map((paso, i) => (
-            <Paso key={paso.titulo} paso={paso} ultimo={i === d.pasos.length - 1} />
-          ))}
-        </section>
-
-        <div className="flex flex-col gap-3.5 rounded-grande bg-tarjeta p-3.5 shadow-tarjeta">
-          <div className="flex items-center gap-3">
-            <img
-              src={d.foto}
-              alt=""
-              className="size-[60px] flex-none rounded-[15px] object-cover"
-            />
-            <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-              <span className="text-[15px] font-bold">{d.producto}</span>
-              <span className="text-[13px] text-tinta-2">
-                {d.cantidad} × {formatoPrecio(d.precio)}
-              </span>
-            </div>
-            <span className="num text-xl font-bold">{formatoPrecio(total)}</span>
-          </div>
-          <Link
-            to={`/perfil/${d.vendedor.id}`}
-            className="flex items-center gap-2.5 rounded-chico bg-papel px-3 py-2.5 text-tinta"
-          >
-            <Avatar id={d.vendedor.id} nombre={d.vendedor.nombre} size={32} />
-            <span className="flex-1 text-sm font-semibold">{d.vendedor.nombre}</span>
-            <span className="text-[13.5px] font-bold text-azul">Ver perfil</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-3 rounded-tarjeta bg-azul-50 py-3.5 pr-4 pl-3.5">
-          <span className="flex size-[42px] flex-none items-center justify-center rounded-full bg-tarjeta text-azul">
-            <MapPin size={20} strokeWidth={2} aria-hidden="true" />
-          </span>
-          <div className="flex flex-1 flex-col gap-0.5">
-            <span className="text-[14.5px] font-bold text-azul">{d.punto}</span>
-            <span className="text-[13.5px] leading-[1.4]">{d.puntoNota}</span>
+            </BarraAccion>
           </div>
         </div>
       </main>
-
-      <BarraAccion>
-        {d.estado === 'pendiente' && (
-          <Boton variante="gris" tamano="md" className="w-full">
-            Cancelar pedido
-          </Boton>
-        )}
-        {d.estado === 'aceptado' && (
-          <div className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-verde-50 text-[15px] font-bold text-verde">
-            <Banknote size={18} strokeWidth={2} aria-hidden="true" />
-            Pagas {formatoPrecio(total)} en efectivo al recoger
-          </div>
-        )}
-        {d.estado === 'entregado' && (
-          <Boton to={`/calificar/${d.id}`} className="w-full">
-            <Star size={18} fill="#FFB547" strokeWidth={0} aria-hidden="true" />
-            Calificar a {corto}
-          </Boton>
-        )}
-        {(d.estado === 'rechazado' || d.estado === 'cancelado') && (
-          <Boton to="/" className="w-full">
-            Ver qué más hay hoy
-          </Boton>
-        )}
-      </BarraAccion>
     </>
   )
 }

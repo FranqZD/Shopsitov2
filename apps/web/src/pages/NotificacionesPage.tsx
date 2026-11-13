@@ -31,7 +31,7 @@ export function NotificacionesPage() {
   const sinLeer = NOTIFICACIONES.flatMap((g) => g.items).filter((n) => nueva(n.id, n.nueva)).length
 
   return (
-    <main className="flex flex-col px-3 pt-3.5 pb-10">
+    <main className="flex flex-col px-3 pt-3.5 pb-10 md:mx-auto md:max-w-2xl">
       <div className="flex items-center gap-3 px-1">
         <BotonRedondo to="/" label="Regresar">
           <ChevronLeft size={22} strokeWidth={2.2} />

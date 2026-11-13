@@ -17,7 +17,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   return (
-    <main className="flex min-h-dvh flex-col px-6 pt-[72px] pb-7">
+    <main className="flex min-h-dvh flex-col px-6 pt-[72px] pb-7 lg:min-h-0 lg:pt-6">
       <LogoShopsito size={72} />
       <h1 className="mt-7 font-display text-[32px] leading-[1.1] font-bold tracking-[-0.02em] text-azul">
         Entra a Shopsito

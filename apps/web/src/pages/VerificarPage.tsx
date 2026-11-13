@@ -30,7 +30,7 @@ export function VerificarPage() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col px-6 pt-3.5 pb-7">
+    <main className="flex min-h-dvh flex-col px-6 pt-3.5 pb-7 lg:min-h-0">
       <div className="-ml-2">
         <BotonRedondo to="/registro" label="Regresar">
           <ChevronLeft size={22} strokeWidth={2.2} />

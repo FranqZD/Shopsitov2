@@ -7,7 +7,7 @@ import { Boton } from '../components/Boton'
 import { Chip } from '../components/Chip'
 import { api } from '../lib/api'
 import { MIS_PUBLICACIONES, VENTAS } from '../lib/ejemplos'
-import { formatoPrecio } from '../lib/formato'
+import { formatoFaltan, formatoPrecio } from '../lib/formato'
 import { useAhora } from '../lib/useAhora'
 
 // TODO: guardar la categoría cuando la API la tenga.
@@ -59,8 +59,8 @@ export function VenderPage() {
   }
 
   return (
-    <main className="flex flex-col">
-      <div className="flex items-start justify-between px-5 pt-5">
+    <main className="flex flex-col md:mx-auto md:max-w-2xl lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-x-2">
+      <div className="flex items-start justify-between px-5 pt-5 lg:col-span-2">
         <div>
           <h1 className="font-display text-[28px] font-bold tracking-[-0.015em] text-azul">
             Vender
@@ -249,7 +249,7 @@ export function VenderPage() {
         </Boton>
       </form>
 
-      <section className="flex flex-col gap-3 px-5 pt-7">
+      <section className="flex flex-col gap-3 px-5 pt-7 lg:sticky lg:top-28 lg:pt-5">
         <div className="flex items-baseline justify-between">
           <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">
             Lo que vendes hoy
@@ -279,7 +279,7 @@ export function VenderPage() {
                     {!agotado && restante > 0 && (
                       <span className="font-bold text-azul">
                         {' '}
-                        · faltan {Math.round(restante / 60)} min
+                        · faltan {formatoFaltan(restante)}
                       </span>
                     )}
                   </span>

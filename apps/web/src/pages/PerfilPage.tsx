@@ -56,7 +56,7 @@ export function PerfilPage() {
 
   return (
     <div className={propio ? 'pb-[120px]' : 'pb-10'}>
-      <div className="relative h-[150px] overflow-hidden rounded-b-hoja bg-azul-50">
+      <div className="relative h-[150px] overflow-hidden rounded-b-hoja bg-azul-50 md:mx-5 md:mt-4 md:h-[190px] md:rounded-hoja">
         <span className="absolute -top-10 -right-10 size-[190px] rounded-full bg-mango/30" />
         <span className="absolute -bottom-20 left-10 size-[160px] rounded-full bg-azul-100" />
         <div className="absolute inset-x-4 top-3.5 flex justify-between">
@@ -69,8 +69,8 @@ export function PerfilPage() {
         </div>
       </div>
 
-      <main className="flex flex-col">
-        <div className="-mt-[60px] flex flex-col items-center gap-2 px-5 text-center">
+      <main className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-x-8">
+        <div className="-mt-[60px] flex flex-col items-center gap-2 px-5 text-center lg:col-span-2">
           <span className="relative rounded-full border-[6px] border-papel">
             <Avatar id={id} nombre={nombre} size={104} />
           </span>
@@ -88,7 +88,7 @@ export function PerfilPage() {
         </div>
 
         {/* TODO: estadísticas de ejemplo; salen de calificaciones y pedidos. */}
-        <div className="grid grid-cols-3 gap-3 px-5 pt-5">
+        <div className="grid grid-cols-3 gap-3 px-5 pt-5 md:mx-auto md:w-full md:max-w-2xl lg:col-span-2">
           {[
             { valor: PERFIL.rating, sub: `${PERFIL.totalResenas} reseñas`, estrella: true },
             { valor: PERFIL.ventas, sub: 'ventas' },
@@ -109,7 +109,7 @@ export function PerfilPage() {
           ))}
         </div>
 
-        <section className="flex flex-col gap-3.5 px-5 pt-7">
+        <section className="flex flex-col gap-3.5 px-5 pt-7 lg:col-start-1">
           <div className="flex items-baseline justify-between">
             <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">
               {propio ? 'Lo que vendes hoy' : 'Lo que vende hoy'}
@@ -121,7 +121,7 @@ export function PerfilPage() {
               {propio ? 'Hoy no has publicado nada.' : `${corto} no tiene nada a la venta hoy.`}
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-x-3 gap-y-3.5">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-3.5 md:grid-cols-3 md:gap-x-4 md:gap-y-5">
               {productos.map((p) => (
                 <Tarjeta
                   key={p.id}
@@ -134,7 +134,7 @@ export function PerfilPage() {
         </section>
 
         {/* TODO: reseñas de ejemplo; reemplazar por GET /api/calificaciones/vendedor/:id. */}
-        <section className="flex flex-col gap-3 px-5 pt-7">
+        <section className="flex flex-col gap-3 px-5 pt-7 lg:col-start-2 lg:row-span-2 lg:row-start-3">
           <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">Reseñas</h2>
           <div className="flex items-center gap-6 rounded-grande bg-tarjeta px-6 py-5 shadow-tarjeta">
             <div className="flex flex-col items-center">
@@ -185,7 +185,7 @@ export function PerfilPage() {
         </section>
 
         {propio ? (
-          <section className="flex flex-col gap-2 px-5 pt-7">
+          <section className="flex flex-col gap-2 px-5 pt-7 lg:col-start-1">
             <h2 className="font-display text-[21px] font-bold tracking-[-0.01em]">Tu cuenta</h2>
             <div className="flex flex-col overflow-hidden rounded-grande bg-tarjeta shadow-tarjeta">
               <button
@@ -230,7 +230,7 @@ export function PerfilPage() {
             </div>
           </section>
         ) : (
-          <div className="flex flex-col items-center gap-2 px-10 pt-7 text-center">
+          <div className="flex flex-col items-center gap-2 px-10 pt-7 text-center lg:col-start-1">
             {/* TODO: POST /api/reportes con objetivoId = id. */}
             <button className="flex h-11 items-center gap-2 text-[15px] font-semibold text-tinta-2">
               <Flag size={18} strokeWidth={2} aria-hidden="true" />

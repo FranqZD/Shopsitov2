@@ -10,7 +10,7 @@ type Props = {
 /** Estados intermedios de las pantallas que dependen del catálogo del día. */
 export function EstadoCarga({ estado, recargar }: Props) {
   return (
-    <main className="flex flex-col gap-5 px-5 pt-3.5">
+    <main className="flex flex-col gap-5 px-5 pt-3.5 md:mx-auto md:max-w-lg">
       <BotonRedondo to="/" label="Regresar a lo de hoy">
         <ChevronLeft size={22} strokeWidth={2.2} />
       </BotonRedondo>
