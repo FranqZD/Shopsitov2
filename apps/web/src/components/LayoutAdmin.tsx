@@ -1,12 +1,12 @@
-import { Flag, MapPin } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { ArrowLeft, Flag, MapPin, Package } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
-import { REPORTES } from '../lib/ejemplos'
+import type { LoginResponse } from '@shopsito/shared'
+import { api } from '../lib/api'
+import type { ContextoAdmin } from '../lib/contextoAdmin'
 import { getSesion } from '../lib/sesion'
 import { Avatar } from './Avatar'
 import { Boton } from './Boton'
-
-// TODO: contar con GET /api/reportes cuando esté implementado.
-const ABIERTOS = REPORTES.filter((r) => r.estado === 'abierto').length
 
 /** Admin de escritorio: menú lateral + contenido. */
 export function LayoutAdmin() {
@@ -27,6 +27,18 @@ export function LayoutAdmin() {
       </main>
     )
   }
+  return <PanelAdmin usuario={sesion.usuario} />
+}
+
+function PanelAdmin({ usuario }: { usuario: LoginResponse['usuario'] }) {
+  const [abiertos, setAbiertos] = useState(0)
+  const recontarReportes = useCallback(() => {
+    api.reportes.listar('abierto').then(
+      (r) => setAbiertos(r.length),
+      () => {},
+    )
+  }, [])
+  useEffect(recontarReportes, [recontarReportes])
 
   const item = ({ isActive }: { isActive: boolean }) =>
     `flex h-[52px] items-center gap-3 rounded-full px-4 text-base font-bold whitespace-nowrap ${isActive ? 'bg-azul-50 text-azul' : 'text-tinta-2'}`
@@ -57,23 +69,36 @@ export function LayoutAdmin() {
         </div>
         <nav aria-label="Administración" className="flex gap-1 lg:flex-col">
           <NavLink to="/admin" end className={item}>
+            <Package size={20} strokeWidth={2} aria-hidden="true" />
+            Productos
+          </NavLink>
+          <NavLink to="/admin/puntos" className={item}>
             <MapPin size={20} strokeWidth={2} aria-hidden="true" />
             Puntos de entrega
           </NavLink>
           <NavLink to="/admin/reportes" className={item}>
             <Flag size={20} strokeWidth={2} aria-hidden="true" />
             <span className="flex-1">Reportes</span>
-            {ABIERTOS > 0 && (
+            {abiertos > 0 && (
               <span className="flex size-[22px] items-center justify-center rounded-full bg-mango text-xs font-extrabold text-sobre-mango">
-                {ABIERTOS}
+                {abiertos}
               </span>
             )}
           </NavLink>
         </nav>
-        <NavLinkPerfil id={sesion.usuario.id} nombre={sesion.usuario.nombre} />
+        <div className="flex flex-col gap-2 lg:mt-6">
+          <NavLinkPerfil id={usuario.id} nombre={usuario.nombre} />
+          <NavLink
+            to="/"
+            className="flex h-11 items-center gap-2 rounded-full px-4 text-[14.5px] font-bold text-azul hover:bg-azul-50"
+          >
+            <ArrowLeft size={18} strokeWidth={2.2} aria-hidden="true" />
+            Volver a Shopsito
+          </NavLink>
+        </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <Outlet />
+        <Outlet context={{ recontarReportes } satisfies ContextoAdmin} />
       </div>
     </div>
   )
@@ -83,7 +108,7 @@ function NavLinkPerfil({ id, nombre }: { id: string; nombre: string }) {
   return (
     <NavLink
       to={`/perfil/${id}`}
-      className="flex items-center gap-2.5 rounded-tarjeta bg-papel p-3 lg:mt-6"
+      className="flex items-center gap-2.5 rounded-tarjeta bg-papel p-3"
     >
       <Avatar id={id} nombre={nombre} size={36} />
       <span className="flex flex-col">

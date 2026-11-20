@@ -2,8 +2,8 @@ import { Bell } from 'lucide-react'
 import { Link } from 'react-router'
 import { NOTIFICACIONES_SIN_LEER, useItemsNav } from '../lib/navegacion'
 import { getSesion } from '../lib/sesion'
-import { Avatar } from './Avatar'
 import { LogoShopsito } from './LogoShopsito'
+import { MenuCuenta } from './MenuCuenta'
 
 /** Tablet y computadora: la misma navegación como pastilla flotante arriba. */
 export function NavSuperior() {
@@ -56,16 +56,7 @@ export function NavSuperior() {
           )}
         </Link>
         {sesion ? (
-          <Link
-            to={`/perfil/${sesion.usuario.id}`}
-            aria-label="Tu perfil"
-            className="flex flex-none items-center gap-2 rounded-full py-1 pr-4 pl-1 hover:bg-azul-50"
-          >
-            <Avatar id={sesion.usuario.id} nombre={sesion.usuario.nombre} size={40} />
-            <span className="hidden text-[15px] font-semibold lg:inline">
-              {sesion.usuario.nombre.split(' ')[0]}
-            </span>
-          </Link>
+          <MenuCuenta usuario={sesion.usuario} />
         ) : (
           <Link
             to="/login"

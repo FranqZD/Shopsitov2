@@ -422,9 +422,10 @@ function TarjetaPublicacion({
   const vistaPrevia = useVistaPrevia(fotoNueva)
   const fotoRef = useRef<HTMLInputElement>(null)
 
-  const agotado = pub.estado === 'agotado' || pub.cantidad === 0
+  const oculto = pub.estado === 'oculto'
+  const agotado = !oculto && (pub.estado === 'agotado' || pub.cantidad === 0)
   const restante = segundosHastaHora(pub.horaLimite, ahora)
-  const cerrada = !agotado && restante <= 0
+  const cerrada = !oculto && !agotado && restante <= 0
 
   const abrirEditor = () => {
     setNombre(pub.nombre)
@@ -475,23 +476,29 @@ function TarjetaPublicacion({
         <FotoProducto
           url={urlFoto(pub.fotoKey)}
           className="size-[60px] flex-none rounded-chico"
-          gris={agotado || cerrada}
+          gris={oculto || agotado || cerrada}
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-[15px] leading-[1.25] font-bold">{pub.nombre}</span>
           <span className="text-[13px] text-tinta-2">
             {formatoPrecio(pub.precio)} · hasta {pub.horaLimite}
-            {!agotado && !cerrada && (
+            {!oculto && !agotado && !cerrada && (
               <span className="font-bold text-azul"> · faltan {formatoFaltan(restante)}</span>
             )}
           </span>
         </div>
         <span
-          className={`inline-flex h-[26px] flex-none items-center rounded-full px-2.5 text-[12.5px] font-bold ${agotado || cerrada ? 'bg-gris-50 text-tinta-2' : 'bg-verde-50 text-verde'}`}
+          className={`inline-flex h-[26px] flex-none items-center rounded-full px-2.5 text-[12.5px] font-bold ${oculto ? 'bg-mango-50 text-mango-tinta' : agotado || cerrada ? 'bg-gris-50 text-tinta-2' : 'bg-verde-50 text-verde'}`}
         >
-          {agotado ? 'Agotado' : cerrada ? 'Cerrada' : 'Activo'}
+          {oculto ? 'Oculto' : agotado ? 'Agotado' : cerrada ? 'Cerrada' : 'Activo'}
         </span>
       </div>
+      {oculto && (
+        <p className="rounded-chico bg-mango-50 px-3.5 py-2.5 text-[13.5px] leading-snug text-mango-tinta">
+          El equipo de Shopsito la sacó del catálogo después de un reporte. Si crees que es un
+          error, escríbenos.
+        </p>
+      )}
 
       {modo === 'editar' ? (
         <form

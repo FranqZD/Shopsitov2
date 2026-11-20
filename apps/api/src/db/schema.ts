@@ -6,6 +6,7 @@ import {
   ESTADOS_PRODUCTO,
   ESTADOS_REPORTE,
   ROLES,
+  TIPOS_OBJETIVO_REPORTE,
   TIPOS_CODIGO,
 } from '@shopsito/shared'
 
@@ -126,8 +127,15 @@ export const reportes = sqliteTable('reportes', {
   reportanteId: text('reportante_id')
     .notNull()
     .references(() => usuarios.id),
-  /** ID del usuario o producto reportado. */
+  /** ID del usuario o producto reportado; `tipoObjetivo` dice cuál. */
   objetivoId: text('objetivo_id').notNull(),
+  tipoObjetivo: text('tipo_objetivo', { enum: TIPOS_OBJETIVO_REPORTE })
+    .notNull()
+    .default('usuario'),
   motivo: text('motivo').notNull(),
+  detalle: text('detalle').notNull().default(''),
   estado: text('estado', { enum: ESTADOS_REPORTE }).notNull().default('abierto'),
+  /** Nota interna del admin al resolver o descartar. */
+  nota: text('nota'),
+  creadoEn: text('creado_en').notNull().default(''),
 })

@@ -7,3 +7,14 @@ export const crearCalificacionSchema = z.object({
   comentario: z.string().trim().max(500).optional(),
 })
 export type CrearCalificacionInput = z.infer<typeof crearCalificacionSchema>
+
+/** Reseña tal como se muestra en el perfil del vendedor. */
+export type Resena = {
+  id: string
+  estrellas: number
+  comentario: string | null
+  fecha: string
+  comprador: { id: string; nombre: string }
+  /** Nombre del primer producto del pedido. */
+  producto: string | null
+}

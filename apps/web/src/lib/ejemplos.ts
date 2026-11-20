@@ -1,6 +1,6 @@
 // Datos de ejemplo del diseño para las pantallas
 // cuya API todavía responde 501. Cada uso tiene un TODO para cambiarlo por la API real.
-import type { EstadoPedido, EstadoReporte } from '@shopsito/shared'
+import type { EstadoPedido } from '@shopsito/shared'
 
 const foto = (n: string) => `/productos/${n}.svg`
 
@@ -289,103 +289,5 @@ export const NOTIFICACIONES: {
         nueva: false,
       },
     ],
-  },
-]
-
-// TODO: reemplazar por GET /api/usuarios/:id y GET /api/calificaciones/vendedor/:id.
-export const PERFIL = {
-  desde: 'En Shopsito desde agosto · casi siempre en la biblioteca',
-  rating: 4.8,
-  totalResenas: 23,
-  ventas: 112,
-  tiempoAceptar: '~5 min',
-  barras: [18, 4, 1, 0, 0],
-  resenas: [
-    {
-      nombre: 'Luis Ángel T.',
-      cuando: 'Hoy',
-      que: 'Molletes',
-      estrellas: 5,
-      texto: 'Llegaron calientitos y el pico de gallo aparte fue buenísima idea.',
-    },
-    {
-      nombre: 'Sofía N.',
-      cuando: 'Hace 3 días',
-      que: 'Agua de jamaica',
-      estrellas: 5,
-      texto: 'Siempre puntual en la biblioteca. La jamaica no está empalagosa.',
-    },
-    {
-      nombre: 'Diego H.',
-      cuando: 'La semana pasada',
-      que: 'Molletes',
-      estrellas: 4,
-      texto: 'Ricos, pero ese día me tocó con poquito queso.',
-    },
-  ],
-}
-
-export type ReporteEjemplo = {
-  id: string
-  motivo: string
-  sobre: string
-  quien: string
-  cuando: string
-  texto: string
-  estado: EstadoReporte
-  esPublicacion?: boolean
-  nota?: string
-}
-
-// TODO: reemplazar por GET /api/reportes (admin).
-export const REPORTES: ReporteEjemplo[] = [
-  {
-    id: 'R-118',
-    motivo: 'Parece producto falso',
-    sobre: 'Publicación: Tenis Nike Air Force talla 26 · Kevin Morales',
-    quien: 'Fernanda Ruiz',
-    cuando: 'Hoy, 9:41',
-    texto:
-      'Dice que son originales a $450, pero la caja y la etiqueta se ven clonadas. No es la primera vez que los publica.',
-    estado: 'abierto',
-    esPublicacion: true,
-  },
-  {
-    id: 'R-117',
-    motivo: 'No llegó al punto de entrega',
-    sobre: 'Usuario: Diego Hernández',
-    quien: 'Sofía Navarro',
-    cuando: 'Ayer, 13:05',
-    texto: 'Me aceptó el pedido, lo esperé 20 minutos en el Edificio T y nunca llegó ni contestó.',
-    estado: 'abierto',
-  },
-  {
-    id: 'R-115',
-    motivo: 'Comentario ofensivo en una reseña',
-    sobre: 'Reseña de Pablo G. a Andrea Gutiérrez',
-    quien: 'Andrea Gutiérrez',
-    cuando: 'Ayer, 9:20',
-    texto: 'La reseña no habla de las galletas, solo se burla de mí.',
-    estado: 'abierto',
-  },
-  {
-    id: 'R-112',
-    motivo: 'Cobró más de lo anunciado',
-    sobre: 'Publicación: Pastel de chocolate rebanada',
-    quien: 'Jorge Castillo',
-    cuando: 'Lun 9 nov',
-    texto: 'Decía $30 y me cobró $40 al entregar.',
-    estado: 'resuelto',
-    nota: 'Se habló con la vendedora; corrigió el precio y devolvió la diferencia.',
-  },
-  {
-    id: 'R-110',
-    motivo: 'Reporte por error',
-    sobre: 'Usuario: Jorge Castillo',
-    quien: 'Paola Medina',
-    cuando: 'Dom 8 nov',
-    texto: 'Perdón, le di reportar sin querer.',
-    estado: 'descartado',
-    nota: 'Lo pidió quien reportó.',
   },
 ]

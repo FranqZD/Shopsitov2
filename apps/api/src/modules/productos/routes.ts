@@ -45,8 +45,34 @@ function exigirHoraFutura(horaLimite: string) {
   }
 }
 
+/**
+ * Borra un producto; si ya tiene pedidos, borrarlo rompería sus pedidos (y lo vendido),
+ * así que solo se saca del catálogo con `siTienePedidos`. Lo usan el vendedor y el admin.
+ */
+export async function quitarProducto(
+  c: Context<AppEnv>,
+  producto: typeof productos.$inferSelect,
+  siTienePedidos: 'agotado' | 'oculto',
+) {
+  const db = getDb(c)
+  const [conPedidos] = await db
+    .select({ id: detallePedido.id })
+    .from(detallePedido)
+    .where(eq(detallePedido.productoId, producto.id))
+    .limit(1)
+  if (conPedidos) {
+    await db
+      .update(productos)
+      .set({ cantidad: 0, estado: siTienePedidos })
+      .where(eq(productos.id, producto.id))
+  } else {
+    await db.delete(productos).where(eq(productos.id, producto.id))
+    if (esFotoR2(producto.fotoKey)) await c.env.FOTOS.delete(producto.fotoKey)
+  }
+}
+
 /** Producto con los datos públicos de su vendedor (la forma de `ProductoHoy`). */
-const conVendedor = (c: Context<AppEnv>) =>
+export const conVendedor = (c: Context<AppEnv>) =>
   getDb(c)
     .select({
       producto: productos,
@@ -133,14 +159,15 @@ export const productosRoutes = new Hono<AppEnv>()
     async (c) => {
       const { id } = c.req.valid('param')
       const datos = c.req.valid('json')
-      await productoPropio(c, id)
+      const producto = await productoPropio(c, id)
       if (datos.horaLimite !== undefined) exigirHoraFutura(datos.horaLimite)
       const [actualizado] = await getDb(c)
         .update(productos)
         .set({
           ...datos,
-          // "Agregar más" a un agotado lo vuelve a poner en el catálogo.
-          ...(datos.cantidad !== undefined && { estado: estadoSegunCantidad(datos.cantidad) }),
+          // "Agregar más" a un agotado lo vuelve a poner en el catálogo (salvo que un admin lo ocultó).
+          ...(datos.cantidad !== undefined &&
+            producto.estado !== 'oculto' && { estado: estadoSegunCantidad(datos.cantidad) }),
         })
         .where(eq(productos.id, id))
         .returning()
@@ -149,20 +176,7 @@ export const productosRoutes = new Hono<AppEnv>()
   )
   .delete('/:id', requireAuth, validar('param', idParamSchema), async (c) => {
     const { id } = c.req.valid('param')
-    const producto = await productoPropio(c, id)
-    const db = getDb(c)
-    const [conPedidos] = await db
-      .select({ id: detallePedido.id })
-      .from(detallePedido)
-      .where(eq(detallePedido.productoId, id))
-      .limit(1)
-    if (conPedidos) {
-      // Borrarlo rompería sus pedidos (y lo vendido hoy): solo se saca del catálogo.
-      await db.update(productos).set({ cantidad: 0, estado: 'agotado' }).where(eq(productos.id, id))
-    } else {
-      await db.delete(productos).where(eq(productos.id, id))
-      if (esFotoR2(producto.fotoKey)) await c.env.FOTOS.delete(producto.fotoKey)
-    }
+    await quitarProducto(c, await productoPropio(c, id), 'agotado')
     return c.body(null, 204)
   })
   // multipart/form-data con el campo `foto`. Reemplaza la foto anterior.
