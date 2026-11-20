@@ -1,0 +1,22 @@
+/** Icono de la app (public/icon.svg) dibujado inline para poder escalarlo. */
+export function LogoShopsito({ size = 72 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 1024 1024" aria-hidden="true">
+      <rect width="1024" height="1024" rx="232" fill="#1F3A68" />
+      <path
+        d="M392 392 V318 Q392 196 512 196 Q632 196 632 318 V392"
+        fill="none"
+        stroke="#FAFAF7"
+        strokeWidth="64"
+        strokeLinecap="round"
+      />
+      <path
+        d="M282 400 Q282 352 330 352 H694 Q742 352 744 400 L770 772 Q774 836 710 836 H314 Q250 836 254 772 Z"
+        fill="#FAFAF7"
+      />
+      <circle cx="392" cy="422" r="26" fill="#1F3A68" />
+      <circle cx="632" cy="422" r="26" fill="#1F3A68" />
+      <circle cx="512" cy="610" r="118" fill="#FFB547" />
+    </svg>
+  )
+}

@@ -1,0 +1,20 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "shopsito-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[dev]
+ip = "0.0.0.0"
+port = 8787
+
+# En local Wrangler simula D1 y R2 dentro de .wrangler/state (no se crea nada en la nube).
+# database_id es un marcador; se reemplazará cuando se cree la base real.
+[[d1_databases]]
+binding = "DB"
+database_name = "shopsito"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FOTOS"
+bucket_name = "shopsito-fotos"

@@ -1,0 +1,18 @@
+# docker compose up → instala dependencias, migra, siembra y levanta web (5173) + api (8787).
+services:
+  dev:
+    build: .devcontainer # node:24 slim + certificados raíz
+    working_dir: /workspace
+    command: sh -c "corepack enable && pnpm preparar && pnpm dev"
+    ports: ['5173:5173', '8787:8787']
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      npm_config_store_dir: /workspace/node_modules/.pnpm-store # mismo volumen = hardlinks
+      VITE_USE_POLLING: '1'
+      WRANGLER_SEND_METRICS: 'false'
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules # binarios de Linux separados de los del host
+
+volumes:
+  node_modules:
