@@ -292,39 +292,6 @@ export const NOTIFICACIONES: {
   },
 ]
 
-// TODO: reemplazar por GET /api/usuarios/:id y GET /api/calificaciones/vendedor/:id.
-export const PERFIL = {
-  desde: 'En Shopsito desde agosto · casi siempre en la biblioteca',
-  rating: 4.8,
-  totalResenas: 23,
-  ventas: 112,
-  tiempoAceptar: '~5 min',
-  barras: [18, 4, 1, 0, 0],
-  resenas: [
-    {
-      nombre: 'Luis Ángel T.',
-      cuando: 'Hoy',
-      que: 'Molletes',
-      estrellas: 5,
-      texto: 'Llegaron calientitos y el pico de gallo aparte fue buenísima idea.',
-    },
-    {
-      nombre: 'Sofía N.',
-      cuando: 'Hace 3 días',
-      que: 'Agua de jamaica',
-      estrellas: 5,
-      texto: 'Siempre puntual en la biblioteca. La jamaica no está empalagosa.',
-    },
-    {
-      nombre: 'Diego H.',
-      cuando: 'La semana pasada',
-      que: 'Molletes',
-      estrellas: 4,
-      texto: 'Ricos, pero ese día me tocó con poquito queso.',
-    },
-  ],
-}
-
 export type ReporteEjemplo = {
   id: string
   motivo: string

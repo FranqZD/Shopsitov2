@@ -189,6 +189,168 @@ const PRODUCTOS: Producto[] = [
   },
 ]
 
+const DIA_MS = 24 * 60 * 60 * 1000
+const haceDias = (dias: number) => new Date(ahora.getTime() - dias * DIA_MS)
+
+/** Días desde que se registró cada usuario (para "En Shopsito desde agosto"). */
+const ALTA: Record<Clave, number> = {
+  admin: 200,
+  ana: 30,
+  beto: 12,
+  mariana: 95,
+  diego: 70,
+  fernanda: 120,
+  jorge: 60,
+  paola: 25,
+  andrea: 45,
+  sofia: 80,
+  luis: 110,
+}
+
+// Historial de días pasados: cada fila es un producto agotado, su pedido entregado y,
+// si trae estrellas, su reseña. Alimenta ventas y reseñas de los perfiles.
+type Venta = {
+  vendedor: Clave
+  comprador: Clave
+  producto: string
+  categoria: CategoriaProducto
+  foto: string
+  precio: number
+  diasAtras: number
+  estrellas?: number
+  comentario?: string
+}
+
+const HISTORIAL: Venta[] = [
+  {
+    vendedor: 'mariana',
+    comprador: 'luis',
+    producto: 'Molletes',
+    categoria: 'comida',
+    foto: 'molletes',
+    precio: 3500,
+    diasAtras: 1,
+    estrellas: 5,
+    comentario: 'Llegaron calientitos y el pico de gallo aparte fue buenísima idea.',
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'sofia',
+    producto: 'Agua de jamaica 1 L',
+    categoria: 'bebidas',
+    foto: 'jamaica',
+    precio: 2500,
+    diasAtras: 3,
+    estrellas: 5,
+    comentario: 'Siempre puntual en la biblioteca. La jamaica no está empalagosa.',
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'diego',
+    producto: 'Molletes',
+    categoria: 'comida',
+    foto: 'molletes',
+    precio: 3500,
+    diasAtras: 8,
+    estrellas: 4,
+    comentario: 'Ricos, pero ese día me tocó con poquito queso.',
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'ana',
+    producto: 'Molletes',
+    categoria: 'comida',
+    foto: 'molletes',
+    precio: 3500,
+    diasAtras: 10,
+    estrellas: 5,
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'jorge',
+    producto: 'Agua de jamaica 1 L',
+    categoria: 'bebidas',
+    foto: 'jamaica',
+    precio: 2500,
+    diasAtras: 15,
+    estrellas: 5,
+    comentario: 'Bien fría, justo lo que necesitaba saliendo del lab.',
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'paola',
+    producto: 'Molletes',
+    categoria: 'comida',
+    foto: 'molletes',
+    precio: 3500,
+    diasAtras: 22,
+    estrellas: 3,
+    comentario: 'Tardó un poco en aceptar, pero sí llegó.',
+  },
+  {
+    vendedor: 'mariana',
+    comprador: 'beto',
+    producto: 'Molletes',
+    categoria: 'comida',
+    foto: 'molletes',
+    precio: 3500,
+    diasAtras: 30,
+  },
+  {
+    vendedor: 'diego',
+    comprador: 'mariana',
+    producto: 'Chilaquiles verdes en vaso',
+    categoria: 'comida',
+    foto: 'chilaquiles',
+    precio: 4500,
+    diasAtras: 2,
+    estrellas: 5,
+    comentario: 'Pican poquito como dice, perfectos.',
+  },
+  {
+    vendedor: 'diego',
+    comprador: 'andrea',
+    producto: 'Chilaquiles verdes en vaso',
+    categoria: 'comida',
+    foto: 'chilaquiles',
+    precio: 4500,
+    diasAtras: 9,
+    estrellas: 4,
+  },
+  {
+    vendedor: 'fernanda',
+    comprador: 'ana',
+    producto: 'Café de olla 12 oz',
+    categoria: 'bebidas',
+    foto: 'cafe',
+    precio: 2000,
+    diasAtras: 4,
+    estrellas: 5,
+    comentario: 'El mejor café del campus, sin exagerar.',
+  },
+  {
+    vendedor: 'fernanda',
+    comprador: 'luis',
+    producto: 'Café de olla 12 oz',
+    categoria: 'bebidas',
+    foto: 'cafe',
+    precio: 2000,
+    diasAtras: 11,
+    estrellas: 5,
+  },
+  {
+    vendedor: 'andrea',
+    comprador: 'sofia',
+    producto: 'Galletas de avena y chocolate (paquete de 3)',
+    categoria: 'snacks',
+    foto: 'galletas',
+    precio: 2500,
+    diasAtras: 6,
+    estrellas: 4,
+    comentario: 'Muy ricas, aunque un poco duras.',
+  },
+]
+
 const BORRAR = [
   'calificaciones',
   'detalle_pedido',
@@ -219,7 +381,7 @@ const sql = [
           : null,
         insignia_comunidad: insignia,
         activo: true,
-        creado_en: ahora.toISOString(),
+        creado_en: haceDias(ALTA[clave]).toISOString(),
       }),
     ),
   )),
@@ -242,6 +404,52 @@ const sql = [
       estado: p.cantidad === 0 ? 'agotado' : 'disponible',
     }),
   ),
+  ...HISTORIAL.flatMap((v, i) => {
+    const dia = haceDias(v.diasAtras)
+    const [productoId, pedidoId] = [id(301 + i), id(401 + i)]
+    return [
+      insert('productos', {
+        id: productoId,
+        vendedor_id: uid[v.vendedor],
+        nombre: v.producto,
+        descripcion: '',
+        precio: v.precio,
+        cantidad: 0,
+        categoria: v.categoria,
+        foto_key: `ejemplo/${v.foto}.svg`,
+        fecha: ahoraCampus(dia).fecha,
+        hora_limite: '14:00',
+        estado: 'agotado',
+      }),
+      insert('pedidos', {
+        id: pedidoId,
+        comprador_id: uid[v.comprador],
+        vendedor_id: uid[v.vendedor],
+        punto_entrega_id: id(101 + (i % 3)),
+        estado: 'entregado',
+        total: v.precio,
+        creado_en: dia.toISOString(),
+      }),
+      insert('detalle_pedido', {
+        id: id(501 + i),
+        pedido_id: pedidoId,
+        producto_id: productoId,
+        cantidad: 1,
+        precio_unitario: v.precio,
+      }),
+      ...(v.estrellas
+        ? [
+            insert('calificaciones', {
+              id: id(601 + i),
+              pedido_id: pedidoId,
+              estrellas: v.estrellas,
+              comentario: v.comentario ?? null,
+              fecha: dia.toISOString(),
+            }),
+          ]
+        : []),
+    ]
+  }),
 ].join('\n')
 
 mkdirSync('.wrangler', { recursive: true })

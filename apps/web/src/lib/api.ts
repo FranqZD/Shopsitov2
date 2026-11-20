@@ -8,11 +8,14 @@ import type {
   LoginInput,
   MiPublicacion,
   Pedido,
+  PerfilUsuario,
   Producto,
   RegistroInput,
   LoginResponse,
   ProductoHoy,
   PuntoEntrega,
+  Resena,
+  UsuarioPrivado,
 } from '@shopsito/shared'
 import { getToken, guardarSesion, rutaLogin } from './sesion'
 
@@ -68,6 +71,13 @@ export const api = {
       request<LoginResponse>('/auth/login', { method: 'POST', body: json(datos) }),
     registro: (datos: RegistroInput) =>
       request<LoginResponse>('/auth/registro', { method: 'POST', body: json(datos) }),
+  },
+  usuarios: {
+    yo: () => request<UsuarioPrivado>('/usuarios/me'),
+    perfil: (id: string) => request<PerfilUsuario>(`/usuarios/${id}`),
+  },
+  calificaciones: {
+    deVendedor: (id: string) => request<Resena[]>(`/calificaciones/vendedor/${id}`),
   },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),

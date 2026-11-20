@@ -40,6 +40,9 @@ describe('api', () => {
     '/api/productos/hoy',
     '/api/productos/00000000-0000-4000-8000-000000000201',
     '/api/puntos-entrega',
+    '/api/usuarios/me',
+    '/api/usuarios/00000000-0000-4000-8000-000000000004',
+    '/api/calificaciones/vendedor/00000000-0000-4000-8000-000000000004',
   ])('GET %s exige sesión', async (ruta) => {
     const res = await app.request(ruta, {}, env)
     expect(res.status).toBe(401)
