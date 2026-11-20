@@ -16,7 +16,6 @@ import { PerfilPage } from './pages/PerfilPage'
 import { RegistroPage } from './pages/RegistroPage'
 import { VenderPage } from './pages/VenderPage'
 import { VentasPage } from './pages/VentasPage'
-import { VerificarPage } from './pages/VerificarPage'
 
 export const router = createBrowserRouter([
   {
@@ -48,7 +47,6 @@ export const router = createBrowserRouter([
     children: [
       { path: '/login', element: <LoginPage /> },
       { path: '/registro', element: <RegistroPage /> },
-      { path: '/verificar', element: <VerificarPage /> },
     ],
   },
   {

@@ -58,6 +58,6 @@ Modelo a copiar: `src/modules/puntos-entrega/routes.ts` (CRUD completo).
 - Si el vendedor no acepta antes de la hora límite del producto, el pedido se cancela solo (resolver al consultar, sin cron).
 - Al llegar la cantidad a 0, el producto pasa a `agotado`.
 - Calificación: solo el comprador de un pedido `entregado`, una por pedido (índice único), 1–5 estrellas.
-- Insignia de comunidad: depende de verificar el correo institucional (`codigos_verificacion` tipo `institucional`).
+- Sin códigos de verificación ni correos: el registro crea la cuenta y devuelve la sesión. Insignia de comunidad: registrarse con un correo `@universidad.edu.mx` o ligarlo con `POST /auth/institucional` (sin código).
 - Fotos en R2 (`c.env.FOTOS`) con key `productos/<id>/<uuid>`; el seed usa keys `ejemplo/<archivo>.svg` que el frontend sirve desde `public/productos`.
 - Auth: JWT HS256 con `{ sub, rol, exp }`, 7 días. Logout sin estado.

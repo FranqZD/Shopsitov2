@@ -93,7 +93,7 @@ El diseño que ya está en la app es la referencia: tokens, componentes base y p
 - **Todo es "de hoy":** la hora límite siempre se ve. Una publicación es urgente cuando faltan ≤ 30 min: chip mango con cuenta regresiva en vivo (`ChipFaltan`). Poco stock (≤ 2) también va en mango.
 - **Colores:** la urgencia se comunica con **mango**, nunca con rojo. El rojo (`error`) es solo para errores reales: sin red, pedido rechazado, ocultar publicación.
 - **Forma:** esquinas muy redondeadas, botones y chips en pastilla (`rounded-full`), sombras suaves (`shadow-tarjeta`) en lugar de bordes. Botón principal de 56 px de alto; todo lo tocable ≥ 44 px.
-- **Tipografía:** Gabarito (`font-display`) para títulos, precios y horas (con `num` para números tabulares); Figtree para el resto. Monoespaciada solo en el código de verificación.
+- **Tipografía:** Gabarito (`font-display`) para títulos, precios y horas (con `num` para números tabulares); Figtree para el resto.
 - **Tono:** directo y cercano, como habla un estudiante. Nada de marketing ("¡Descubre…!") ni "Bienvenido de nuevo".
 - **Evitar:** bordes duros, esquinas rectas, degradados morados, glassmorphism y emojis como iconos.
 
@@ -171,15 +171,15 @@ El diseño que ya está en la app es la referencia: tokens, componentes base y p
 - `GET /api/health`
 - `GET /api/productos/hoy` (filtro del día por zona horaria del campus, con datos del vendedor)
 - `/api/puntos-entrega`: CRUD completo (lectura pública; crear/editar/borrar solo admin)
-- `POST /api/auth/login` (mínimo, para probar rutas protegidas) y `POST /api/auth/logout` (sin estado)
+- `/api/auth`: `registro` (sin código de verificación; responde con la sesión abierta), `login`, `logout` (sin estado) e `institucional` (liga un correo `@universidad.edu.mx` y da la insignia de comunidad; registrarse con ese correo también la da)
+  - No se mandan correos ni códigos de verificación
 - Middleware JWT (`requireAuth`, `requireAdmin`), validación Zod y errores centralizados
 - Web con el diseño aprobado. Con datos reales: catálogo (`/`), detalle (`/producto/:id`), confirmar (puntos de entrega reales), entrar (`/login`) y admin de puntos de entrega (`/admin`)
 
 **Stub (`501 Not Implemented`, con validación ya conectada)**
 
-- auth: registro, verificación de código, correo institucional
 - usuarios, resto de productos (detalle, crear, editar, borrar, foto en R2), pedidos, calificaciones, notificaciones, reportes
-- Pantallas web con datos de ejemplo (`lib/ejemplos.ts`) hasta que exista su API: mis pedidos y detalle, calificar, vender y mis ventas, perfil (reseñas y estadísticas), notificaciones, reportes de admin. Registro, verificar, publicar y confirmar pedido ya llaman a la API y muestran su respuesta 501.
+- Pantallas web con datos de ejemplo (`lib/ejemplos.ts`) hasta que exista su API: mis pedidos y detalle, calificar, vender y mis ventas, perfil (reseñas y estadísticas), notificaciones, reportes de admin. Registro y entrar ya usan la API real; publicar y confirmar pedido llaman a la API y muestran su respuesta 501.
 - Datos que el diseño muestra pero la API aún no tiene: categoría del producto, cantidad inicial (barra "Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido y método de pago.
 
 **Fuera de alcance por ahora**: notificaciones en tiempo real (hay un TODO), Terraform, CI y recursos en la nube.

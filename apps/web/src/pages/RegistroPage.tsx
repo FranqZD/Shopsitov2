@@ -5,6 +5,7 @@ import { Boton } from '../components/Boton'
 import { BotonRedondo } from '../components/BotonRedondo'
 import { InsigniaMini } from '../components/Insignia'
 import { api } from '../lib/api'
+import { guardarSesion } from '../lib/sesion'
 
 const CAMPO =
   'h-[54px] w-full rounded-[18px] bg-tarjeta px-[18px] text-base text-tinta shadow-tarjeta outline-none focus:ring-2 focus:ring-azul'
@@ -48,7 +49,10 @@ export function RegistroPage() {
           e.preventDefault()
           setError(null)
           api.auth.registro({ nombre, correo, password }).then(
-            () => navigate(`/verificar?correo=${encodeURIComponent(correo)}`),
+            (sesion) => {
+              guardarSesion(sesion)
+              navigate('/')
+            },
             (err: Error) => setError(err.message),
           )
         }}

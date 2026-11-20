@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ahoraCampus, crearProductoSchema, segundosHastaHora } from './index'
+import { ahoraCampus, crearProductoSchema, esCorreoInstitucional, segundosHastaHora } from './index'
 
 describe('ahoraCampus', () => {
   it('convierte a la hora de Ciudad de México (UTC-6)', () => {
@@ -40,5 +40,18 @@ describe('crearProductoSchema', () => {
       horaLimite: '14:00',
     })
     expect(r.success).toBe(true)
+  })
+})
+
+describe('esCorreoInstitucional', () => {
+  it('acepta el dominio de la universidad y sus subdominios', () => {
+    expect(esCorreoInstitucional('Ana@Universidad.edu.mx')).toBe(true)
+    expect(esCorreoInstitucional('ana@alumnos.universidad.edu.mx')).toBe(true)
+  })
+
+  it('rechaza otros dominios aunque se parezcan', () => {
+    expect(esCorreoInstitucional('ana@gmail.com')).toBe(false)
+    expect(esCorreoInstitucional('ana@miuniversidad.edu.mx')).toBe(false)
+    expect(esCorreoInstitucional('ana@universidad.edu.mx.falso.com')).toBe(false)
   })
 })
