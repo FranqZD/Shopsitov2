@@ -17,7 +17,6 @@ import { PerfilPage } from './pages/PerfilPage'
 import { RegistroPage } from './pages/RegistroPage'
 import { VenderPage } from './pages/VenderPage'
 import { VentasPage } from './pages/VentasPage'
-import { VerificarPage } from './pages/VerificarPage'
 
 export const router = createBrowserRouter([
   {
@@ -68,8 +67,6 @@ export const router = createBrowserRouter([
           { path: '/registro', element: <RegistroPage /> },
         ],
       },
-      // Verificar sigue al registro, que todavía no abre sesión.
-      { path: '/verificar', element: <VerificarPage /> },
     ],
   },
 ])

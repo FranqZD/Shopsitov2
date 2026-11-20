@@ -8,7 +8,6 @@ import type {
   Pedido,
   Producto,
   RegistroInput,
-  VerificarCodigoInput,
   LoginResponse,
   ProductoHoy,
   PuntoEntrega,
@@ -65,11 +64,8 @@ export const api = {
   auth: {
     login: (datos: LoginInput) =>
       request<LoginResponse>('/auth/login', { method: 'POST', body: json(datos) }),
-    // La API responde 501 por ahora; la UI muestra el error tal cual.
     registro: (datos: RegistroInput) =>
-      request<void>('/auth/registro', { method: 'POST', body: json(datos) }),
-    verificar: (datos: VerificarCodigoInput) =>
-      request<void>('/auth/verificar', { method: 'POST', body: json(datos) }),
+      request<LoginResponse>('/auth/registro', { method: 'POST', body: json(datos) }),
   },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),
