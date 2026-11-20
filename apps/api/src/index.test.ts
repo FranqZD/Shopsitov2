@@ -33,4 +33,33 @@ describe('api', () => {
     expect(res.status).toBe(400)
     expect(await res.json()).toMatchObject({ error: { code: 'VALIDATION_ERROR' } })
   })
+
+  const post = (ruta: string, body: unknown) =>
+    app.request(
+      ruta,
+      {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'content-type': 'application/json' },
+      },
+      env,
+    )
+
+  it('registro valida nombre, correo y contraseña', async () => {
+    const res = await post('/api/auth/registro', {
+      nombre: 'A',
+      correo: 'no-es-correo',
+      password: '123',
+    })
+    expect(res.status).toBe(400)
+    const { error } = (await res.json()) as { error: { details: { fieldErrors: object } } }
+    expect(Object.keys(error.details.fieldErrors).sort()).toEqual(['correo', 'nombre', 'password'])
+  })
+
+  it('el correo institucional exige token', async () => {
+    const res = await post('/api/auth/institucional', {
+      correoInstitucional: 'ana@universidad.edu.mx',
+    })
+    expect(res.status).toBe(401)
+  })
 })

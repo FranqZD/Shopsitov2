@@ -1,6 +1,6 @@
 # Shopsito: contexto para sesiones de Claude
 
-Marketplace del día para la comunidad de una universidad. Cualquiera publica lo que trae **hoy** (comida, snacks, artículos) con precio, cantidad y hora límite; otros lo piden y lo recogen en puntos de entrega del campus. El vendedor acepta y entrega; el comprador sigue el estado y califica. Registro con código al correo; con correo institucional se gana la insignia "Comunidad". Un admin gestiona puntos de entrega y revisa reportes.
+Marketplace del día para la comunidad de una universidad. Cualquiera publica lo que trae **hoy** (comida, snacks, artículos) con precio, cantidad y hora límite; otros lo piden y lo recogen en puntos de entrega del campus. El vendedor acepta y entrega; el comprador sigue el estado y califica. Registro directo, sin códigos de verificación; con correo institucional se gana la insignia "Comunidad". Un admin gestiona puntos de entrega y revisa reportes.
 
 Proyecto escolar de 3 personas. Prioridad: simple y que funcione de punta a punta en local. **No** crear recursos en la nube, Terraform ni CI salvo que se pida.
 
@@ -51,15 +51,15 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 
 ## Estado actual (actualízalo cuando implementes algo)
 
-**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, CRUD de `/api/puntos-entrega`, `POST /api/auth/login` (mínimo) y `logout`, middleware JWT, validación y errores, esquema D1 con migración inicial y seed.
+**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, CRUD de `/api/puntos-entrega`, auth completo (registro que deja la sesión abierta, login, logout, `POST /auth/institucional` → insignia; registrarse con correo de la uni también la da), middleware JWT, validación y errores, esquema D1 con migración inicial y seed.
 
-**Backend en 501 (rutas y validación ya existen):** registro/verificación/institucional, usuarios, productos (detalle, crear, editar, borrar, foto R2), pedidos (todo), calificaciones, notificaciones, reportes.
+**Backend en 501 (rutas y validación ya existen):** usuarios, productos (detalle, crear, editar, borrar, foto R2), pedidos (todo), calificaciones, notificaciones, reportes.
 
-**Frontend:** todas las pantallas existen con el diseño final y son responsive. Usan datos reales: catálogo, detalle de producto (lo busca en el catálogo del día), confirmar (puntos reales), entrar y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Registro, verificar, publicar y confirmar pedido ya llaman a la API y muestran el 501.
+**Frontend:** todas las pantallas existen con el diseño final y son responsive. Usan datos reales: catálogo, detalle de producto (lo busca en el catálogo del día), confirmar (puntos reales), entrar y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Registro y entrar usan la API real; publicar y confirmar pedido llaman a la API y muestran el 501. Aún no hay pantalla para el correo institucional.
 
 **Datos que el diseño muestra y el modelo aún no tiene:** categoría del producto, cantidad inicial ("Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido, método de pago.
 
-**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor), luego publicar productos y registro.
+**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor), luego publicar productos.
 
 Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts` que ya no se usen y sus `TODO`.
 
@@ -69,6 +69,7 @@ Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts
 - IDs UUID en texto; fechas en texto ISO; **dinero en centavos** (entero). La UI convierte con `formatoPrecio`.
 - Zona horaria del campus `America/Mexico_City`. Usa `ahoraCampus()` y `segundosHastaHora()` de `@shopsito/shared`; nunca `new Date().getHours()`.
 - No hay cron: el catálogo del día se filtra por `fecha = hoy` y `horaLimite > ahora`.
+- Sin correos ni códigos de verificación: **no se mandan correos** (nada de SMTP ni servicios de correo) y el registro no pide código. La tabla `codigos_verificacion` y la columna `correo_verificado` quedan sin uso (todo usuario nuevo nace verificado).
 - Notificaciones en tiempo real: fuera de alcance (hay TODO); se consultan al abrir la pantalla.
 - Comentarios solo donde aportan el "por qué", como el código existente.
 
