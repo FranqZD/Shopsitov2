@@ -30,3 +30,13 @@ export type Producto = {
 export type ProductoHoy = Producto & {
   vendedor: { id: string; nombre: string; insigniaComunidad: boolean }
 }
+
+/** Publicación del vendedor en "Lo que vendes hoy" (GET /productos/mios). */
+export type MiPublicacion = Producto & {
+  /** Unidades en pedidos vigentes (pendiente, aceptado o entregado). */
+  vendidos: number
+  /** Centavos de esos pedidos. */
+  ingresos: number
+  /** Cantidad con la que se publicó: lo que queda más lo vendido. */
+  total: number
+}

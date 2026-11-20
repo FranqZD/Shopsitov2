@@ -1,10 +1,12 @@
 import type {
+  ActualizarProductoInput,
   ActualizarPuntoEntregaInput,
   ApiError,
   CrearPedidoInput,
   CrearProductoInput,
   CrearPuntoEntregaInput,
   LoginInput,
+  MiPublicacion,
   Pedido,
   Producto,
   RegistroInput,
@@ -64,6 +66,15 @@ export const api = {
   },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),
+    mios: () => request<MiPublicacion[]>('/productos/mios'),
+    actualizar: (id: string, datos: ActualizarProductoInput) =>
+      request<Producto>(`/productos/${id}`, { method: 'PATCH', body: json(datos) }),
+    eliminar: (id: string) => request<void>(`/productos/${id}`, { method: 'DELETE' }),
+    subirFoto: (id: string, foto: Blob) => {
+      const datos = new FormData()
+      datos.append('foto', foto, 'foto.jpg')
+      return request<Producto>(`/productos/${id}/foto`, { method: 'POST', body: datos })
+    },
     crear: (datos: CrearProductoInput) =>
       request<Producto>('/productos', { method: 'POST', body: json(datos) }),
   },
