@@ -139,4 +139,58 @@ describe('api', () => {
     expect(res.status).toBe(400)
     expect(await res.json()).toMatchObject({ error: { code: 'HORA_LIMITE_PASADA' } })
   })
+
+  describe('admin', () => {
+    const tokenDe = (rol: 'usuario' | 'admin') =>
+      sign(
+        { sub: crypto.randomUUID(), rol, exp: Math.floor(Date.now() / 1000) + 60 },
+        env.JWT_SECRET,
+        JWT_ALG,
+      )
+
+    it.each(['/api/admin/productos', '/api/reportes'])(
+      'GET %s es solo para admins',
+      async (ruta) => {
+        expect((await app.request(ruta, {}, env)).status).toBe(401)
+        const res = await app.request(
+          ruta,
+          { headers: { authorization: `Bearer ${await tokenDe('usuario')}` } },
+          env,
+        )
+        expect(res.status).toBe(403)
+      },
+    )
+
+    it('el admin solo puede ocultar o mostrar, no marcar agotado', async () => {
+      const res = await app.request(
+        '/api/admin/productos/00000000-0000-4000-8000-000000000201',
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ estado: 'agotado' }),
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${await tokenDe('admin')}`,
+          },
+        },
+        env,
+      )
+      expect(res.status).toBe(400)
+    })
+
+    it('reportar exige un motivo', async () => {
+      const res = await app.request(
+        '/api/reportes',
+        {
+          method: 'POST',
+          body: JSON.stringify({ objetivoId: crypto.randomUUID(), motivo: '' }),
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${await tokenDe('usuario')}`,
+          },
+        },
+        env,
+      )
+      expect(res.status).toBe(400)
+    })
+  })
 })

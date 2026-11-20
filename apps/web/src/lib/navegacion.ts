@@ -1,4 +1,4 @@
-import { CirclePlus, ShoppingBag, Sun, User, type LucideIcon } from 'lucide-react'
+import { CirclePlus, Shield, ShoppingBag, Sun, User, type LucideIcon } from 'lucide-react'
 import { useLocation } from 'react-router'
 import { ACTIVOS, NOTIFICACIONES, PEDIDOS } from './ejemplos'
 import { getSesion } from './sesion'
@@ -15,13 +15,18 @@ export type ItemNav = {
   Icono: LucideIcon
   activo: boolean
   badge?: number
+  /** Solo en la nav superior (tablet/computadora); la inferior tiene 4 lugares fijos. */
+  soloArriba?: boolean
 }
 
-/** Secciones principales (Hoy · Vender · Pedidos · Perfil), compartidas por la nav inferior y la superior. */
+/**
+ * Secciones principales (Hoy · Vender · Pedidos · Perfil), compartidas por la nav inferior y la
+ * superior. Los admins tienen además "Admin", solo arriba.
+ */
 export function useItemsNav(): ItemNav[] {
   const { pathname } = useLocation()
   const sesion = getSesion()
-  return [
+  const items: ItemNav[] = [
     { to: '/', label: 'Hoy', Icono: Sun, activo: pathname === '/' },
     {
       to: '/vender',
@@ -43,4 +48,14 @@ export function useItemsNav(): ItemNav[] {
       activo: !!sesion && pathname === `/perfil/${sesion.usuario.id}`,
     },
   ]
+  if (sesion?.usuario.rol === 'admin') {
+    items.push({
+      to: '/admin',
+      label: 'Admin',
+      Icono: Shield,
+      activo: pathname.startsWith('/admin'),
+      soloArriba: true,
+    })
+  }
+  return items
 }

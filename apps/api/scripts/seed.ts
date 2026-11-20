@@ -351,6 +351,61 @@ const HISTORIAL: Venta[] = [
   },
 ]
 
+// Reportes de ejemplo. `objetivo` es una clave de usuario o el índice de un producto de PRODUCTOS.
+type ReporteSeed = {
+  reportante: Clave
+  objetivo: Clave | number
+  motivo: string
+  detalle: string
+  horasAtras: number
+  estado?: 'resuelto' | 'descartado'
+  nota?: string
+}
+
+const REPORTES: ReporteSeed[] = [
+  {
+    reportante: 'fernanda',
+    objetivo: 8,
+    motivo: 'Precio sospechoso',
+    detalle:
+      'Dice que funciona perfecto pero el precio está muy por encima de lo normal para una usada.',
+    horasAtras: 2,
+  },
+  {
+    reportante: 'sofia',
+    objetivo: 'diego',
+    motivo: 'No llegó al punto de entrega',
+    detalle:
+      'Me aceptó el pedido, lo esperé 20 minutos en el Edificio T y nunca llegó ni contestó.',
+    horasAtras: 20,
+  },
+  {
+    reportante: 'andrea',
+    objetivo: 'beto',
+    motivo: 'Trato ofensivo',
+    detalle: 'Me escribió de mala manera cuando le pregunté por el pedido.',
+    horasAtras: 30,
+  },
+  {
+    reportante: 'jorge',
+    objetivo: 'mariana',
+    motivo: 'Cobró más de lo anunciado',
+    detalle: 'Decía $30 y me cobró $40 al entregar.',
+    horasAtras: 24 * 11,
+    estado: 'resuelto',
+    nota: 'Se habló con la vendedora; corrigió el precio y devolvió la diferencia.',
+  },
+  {
+    reportante: 'paola',
+    objetivo: 'jorge',
+    motivo: 'Reporte por error',
+    detalle: 'Perdón, le di reportar sin querer.',
+    horasAtras: 24 * 12,
+    estado: 'descartado',
+    nota: 'Lo pidió quien reportó.',
+  },
+]
+
 const BORRAR = [
   'calificaciones',
   'detalle_pedido',
@@ -450,6 +505,19 @@ const sql = [
         : []),
     ]
   }),
+  ...REPORTES.map((r, i) =>
+    insert('reportes', {
+      id: id(701 + i),
+      reportante_id: uid[r.reportante],
+      objetivo_id: typeof r.objetivo === 'number' ? id(201 + r.objetivo) : uid[r.objetivo],
+      tipo_objetivo: typeof r.objetivo === 'number' ? 'producto' : 'usuario',
+      motivo: r.motivo,
+      detalle: r.detalle,
+      estado: r.estado ?? 'abierto',
+      nota: r.nota ?? null,
+      creado_en: new Date(ahora.getTime() - r.horasAtras * 60 * 60 * 1000).toISOString(),
+    }),
+  ),
 ].join('\n')
 
 mkdirSync('.wrangler', { recursive: true })

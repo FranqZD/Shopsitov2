@@ -104,8 +104,7 @@ export function AdminPuntosPage() {
         {[
           ['Activos', activos],
           ['Inactivos', (puntos?.length ?? 0) - activos],
-          // TODO: entregas de hoy por punto cuando exista la consulta de pedidos.
-          ['Entregas hoy', '—'],
+          ['En total', puntos?.length ?? 0],
         ].map(([t, v]) => (
           <div
             key={t}

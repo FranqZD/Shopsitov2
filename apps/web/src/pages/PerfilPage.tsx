@@ -21,6 +21,7 @@ import {
 } from '@shopsito/shared'
 import { Avatar } from '../components/Avatar'
 import { Boton } from '../components/Boton'
+import { Chip } from '../components/Chip'
 import { BotonRedondo } from '../components/BotonRedondo'
 import { Estrellas } from '../components/Estrellas'
 import { SinVerificar } from '../components/Insignia'
@@ -256,16 +257,7 @@ function Perfil({ perfil, resenas }: { perfil: PerfilUsuario; resenas: Resena[] 
           {propio ? (
             <TuCuenta esAdmin={sesion?.usuario.rol === 'admin'} />
           ) : (
-            <div className="flex flex-col items-center gap-2 px-10 pt-7 text-center lg:mt-auto">
-              {/* TODO: POST /api/reportes con objetivoId = id. */}
-              <button className="flex h-11 items-center gap-2 text-[15px] font-semibold text-tinta-2">
-                <Flag size={18} strokeWidth={2} aria-hidden="true" />
-                Reportar a {corto}
-              </button>
-              <span className="text-[13px] leading-normal text-tinta-2">
-                Lo revisa el equipo de Shopsito. {corto} no sabe quién hizo el reporte.
-              </span>
-            </div>
+            <Reportar id={perfil.id} corto={corto} />
           )}
         </div>
 
@@ -409,5 +401,102 @@ function TuCuenta({ esAdmin }: { esAdmin: boolean }) {
         </button>
       </div>
     </section>
+  )
+}
+
+const MOTIVOS = [
+  'No llegó al punto de entrega',
+  'Cobró más de lo anunciado',
+  'Producto falso o engañoso',
+  'Trato ofensivo',
+  'Otro',
+]
+
+/** Reportar a otra persona: lo revisa el admin en /admin/reportes. */
+function Reportar({ id, corto }: { id: string; corto: string }) {
+  const [abierto, setAbierto] = useState(false)
+  const [motivo, setMotivo] = useState<string | null>(null)
+  const [detalle, setDetalle] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [enviado, setEnviado] = useState(false)
+
+  if (enviado)
+    return (
+      <p
+        role="status"
+        className="mx-5 mt-7 rounded-tarjeta bg-verde-50 px-4 py-4 text-center text-[14.5px] leading-normal text-verde lg:mt-auto"
+      >
+        Gracias. El equipo de Shopsito lo va a revisar; {corto} no sabe quién lo reportó.
+      </p>
+    )
+
+  if (!abierto)
+    return (
+      <div className="flex flex-col items-center gap-2 px-10 pt-7 text-center lg:mt-auto">
+        <button
+          onClick={() => setAbierto(true)}
+          className="flex h-11 items-center gap-2 text-[15px] font-semibold text-tinta-2"
+        >
+          <Flag size={18} strokeWidth={2} aria-hidden="true" />
+          Reportar a {corto}
+        </button>
+        <span className="text-[13px] leading-normal text-tinta-2">
+          Lo revisa el equipo de Shopsito. {corto} no sabe quién hizo el reporte.
+        </span>
+      </div>
+    )
+
+  return (
+    <form
+      className="mx-5 mt-7 flex flex-col gap-3 rounded-grande bg-tarjeta p-5 shadow-tarjeta lg:mt-auto"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!motivo) return
+        setEnviando(true)
+        setError(null)
+        api.reportes
+          .crear({ objetivoId: id, motivo, detalle })
+          .then(
+            () => setEnviado(true),
+            (err: Error) => setError(err.message),
+          )
+          .finally(() => setEnviando(false))
+      }}
+    >
+      <h2 className="font-display text-[19px] font-bold">¿Qué pasó con {corto}?</h2>
+      <div className="flex flex-wrap gap-2">
+        {MOTIVOS.map((m) => (
+          <Chip key={m} activo={motivo === m} onClick={() => setMotivo(m)} className="text-[14px]">
+            {m}
+          </Chip>
+        ))}
+      </div>
+      <label htmlFor="rdetalle" className="text-sm font-bold">
+        Cuéntanos más <span className="font-normal text-tinta-2">(opcional)</span>
+      </label>
+      <textarea
+        id="rdetalle"
+        rows={3}
+        maxLength={500}
+        value={detalle}
+        onChange={(e) => setDetalle(e.target.value)}
+        placeholder="Qué pasó, cuándo y dónde"
+        className="-mt-1.5 resize-none rounded-chico border-[1.5px] border-azul-100 bg-tarjeta px-4 py-3 text-[15px] outline-none focus:border-azul focus:ring-2 focus:ring-azul/30"
+      />
+      {error && (
+        <p role="alert" className="text-[13.5px] font-semibold text-error">
+          {error}
+        </p>
+      )}
+      <div className="grid grid-cols-[1.4fr_1fr] gap-2.5">
+        <Boton type="submit" tamano="md" disabled={!motivo || enviando}>
+          Enviar reporte
+        </Boton>
+        <Boton variante="gris" tamano="md" onClick={() => setAbierto(false)}>
+          Cancelar
+        </Boton>
+      </div>
+    </form>
   )
 }
