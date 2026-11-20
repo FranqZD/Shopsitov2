@@ -1,42 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
+import { Bell, LayoutGrid, Plus, RefreshCw, Search, Timer, WifiOff } from 'lucide-react'
 import {
-  Bell,
-  Cookie,
-  CupSoda,
-  LayoutGrid,
-  Package,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Search,
-  Timer,
-  Utensils,
-  WifiOff,
-  type LucideIcon,
-} from 'lucide-react'
-import { ahoraCampus, segundosHastaHora, type ProductoHoy } from '@shopsito/shared'
+  ahoraCampus,
+  segundosHastaHora,
+  type CategoriaProducto,
+  type ProductoHoy,
+} from '@shopsito/shared'
 import { Boton } from '../components/Boton'
 import { ChipFaltan, SEGUNDOS_URGENTE } from '../components/ChipHora'
 import { Chip } from '../components/Chip'
 import { FotoProducto } from '../components/FotoProducto'
 import { ProntoSkeleton, TarjetaSkeleton } from '../components/Skeleton'
 import { Tarjeta } from '../components/Tarjeta'
+import { CATEGORIAS } from '../lib/categorias'
 import { NOTIFICACIONES } from '../lib/ejemplos'
 import { cosas, formatoPrecio, saludo, tituloHoy } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
 import { useAhora } from '../lib/useAhora'
 import { useProductosHoy } from '../lib/useProductosHoy'
 
-// TODO: los productos aún no tienen categoría en la API; por ahora solo "Todo" filtra de verdad.
-const CATEGORIAS: { id: string; nombre: string; Icono: LucideIcon }[] = [
-  { id: 'todo', nombre: 'Todo', Icono: LayoutGrid },
-  { id: 'comida', nombre: 'Comida', Icono: Utensils },
-  { id: 'bebidas', nombre: 'Bebidas', Icono: CupSoda },
-  { id: 'snacks', nombre: 'Snacks', Icono: Cookie },
-  { id: 'articulos', nombre: 'Artículos', Icono: Package },
-  { id: 'utiles', nombre: 'Útiles', Icono: Pencil },
-]
+const FILTROS = [{ id: 'todo', nombre: 'Todo', Icono: LayoutGrid } as const, ...CATEGORIAS]
 
 /** Publicaciones que cierran en menos de 1 h aparecen en "Se acaba pronto". */
 const SEGUNDOS_PRONTO = 3600
@@ -49,14 +33,19 @@ export function CatalogoPage() {
   const ahora = useAhora()
   const { fecha, hora } = ahoraCampus(ahora)
   const [busqueda, setBusqueda] = useState('')
-  const [categoria, setCategoria] = useState('todo')
+  const [categoria, setCategoria] = useState<CategoriaProducto | 'todo'>('todo')
 
   const segundos = (p: ProductoHoy) => segundosHastaHora(p.horaLimite, ahora)
-  const productos = useMemo(() => (estado.tipo === 'listo' ? estado.productos : []), [estado])
-  const lista = useMemo(() => {
-    const q = busqueda.trim().toLowerCase()
-    return q ? productos.filter((p) => p.nombre.toLowerCase().includes(q)) : productos
-  }, [productos, busqueda])
+  // Lo que cierra mientras la pantalla está abierta se quita sin esperar a la siguiente carga.
+  const productos = (estado.tipo === 'listo' ? estado.productos : []).filter(
+    (p) => p.fecha === fecha && segundos(p) > 0,
+  )
+  const q = busqueda.trim().toLowerCase()
+  const lista = productos.filter(
+    (p) =>
+      (categoria === 'todo' || p.categoria === categoria) &&
+      (!q || p.nombre.toLowerCase().includes(q) || p.descripcion.toLowerCase().includes(q)),
+  )
   // La lista que llega de la API ya viene ordenada por hora límite.
   const pronto = lista.filter((p) => p.cantidad > 0 && segundos(p) <= SEGUNDOS_PRONTO).slice(0, 5)
 
@@ -128,7 +117,7 @@ export function CatalogoPage() {
       )}
 
       <div className="sin-scrollbar flex gap-2 overflow-x-auto px-5 pt-[18px] pb-1">
-        {CATEGORIAS.map(({ id, nombre, Icono }) => (
+        {FILTROS.map(({ id, nombre, Icono }) => (
           <Chip
             key={id}
             activo={categoria === id}
@@ -274,7 +263,11 @@ export function CatalogoPage() {
                 Todo lo de hoy
               </h2>
               <span className="text-[13px] text-tinta-2">
-                {lista.length ? cosas(lista.length) : 'Nada con esa búsqueda'}
+                {lista.length
+                  ? cosas(lista.length)
+                  : q
+                    ? 'Nada con esa búsqueda'
+                    : 'Nada en esta categoría por ahora'}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-3.5 md:grid-cols-3 md:gap-x-4 md:gap-y-5 lg:grid-cols-4 xl:grid-cols-5">

@@ -13,23 +13,25 @@ import { SelectorCantidad } from '../components/SelectorCantidad'
 import { formatoCuenta, formatoFaltan, formatoPrecio, nombreCorto } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
 import { useAhora } from '../lib/useAhora'
-import { useProductosHoy } from '../lib/useProductosHoy'
+import { nombreCategoria } from '../lib/categorias'
+import { abiertoHoy, useProducto } from '../lib/useProducto'
 import { EstadoCarga } from './EstadoCarga'
 
-// TODO: usar GET /api/productos/:id cuando exista; por ahora se busca en el catálogo del día.
 export function DetallePage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { estado, recargar } = useProductosHoy()
+  const { estado, recargar } = useProducto(id ?? '')
   const ahora = useAhora()
   const [cantidad, setCantidad] = useState(1)
   const [rebote, setRebote] = useState(0)
 
   if (estado.tipo !== 'listo') return <EstadoCarga estado={estado} recargar={recargar} />
-  const p = estado.productos.find((x) => x.id === id)
-  if (!p) return <EstadoCarga estado={{ tipo: 'no-encontrado' }} recargar={recargar} />
+  const p = estado.producto
+  // Si ya cerró (otro día o pasó su hora límite) no se puede pedir; agotado sí se muestra.
+  if (!abiertoHoy(p, ahora))
+    return <EstadoCarga estado={{ tipo: 'no-encontrado' }} recargar={recargar} />
 
-  const agotado = p.cantidad === 0
+  const agotado = p.cantidad === 0 || p.estado === 'agotado'
   const restante = Math.max(0, segundosHastaHora(p.horaLimite, ahora))
   const urgente = !agotado && restante <= SEGUNDOS_URGENTE
   const q = Math.min(cantidad, Math.max(p.cantidad, 1))
@@ -93,7 +95,10 @@ export function DetallePage() {
 
         <div className="flex flex-col gap-[18px] px-5 pt-10 pb-5 md:px-0 md:pt-6">
           <div className="flex flex-col gap-2.5">
-            {/* TODO: pastilla de categoría y "Publicado a las 7:42" cuando la API tenga esos datos. */}
+            {/* TODO: "Publicado a las 7:42" cuando la API guarde la hora de publicación. */}
+            <span className="inline-flex h-7 items-center self-start rounded-full bg-azul-50 px-3 text-[13px] font-bold text-azul">
+              {nombreCategoria(p.categoria)}
+            </span>
             <h1 className="font-display text-[29px] leading-[1.08] font-bold tracking-[-0.015em] md:text-[38px]">
               {p.nombre}
             </h1>

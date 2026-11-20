@@ -14,7 +14,7 @@ import type {
   ProductoHoy,
   PuntoEntrega,
 } from '@shopsito/shared'
-import { getToken } from './sesion'
+import { getToken, guardarSesion, rutaLogin } from './sesion'
 
 export class ApiRequestError extends Error {
   constructor(
@@ -43,6 +43,11 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`/api${path}`, { ...init, headers })
   if (res.status === 204) return undefined as T
   const data: unknown = await res.json().catch(() => null)
+  if (res.status === 401 && token) {
+    // El token ya no sirve (venció, cambió el secreto o se desactivó la cuenta): a entrar de nuevo.
+    guardarSesion(null)
+    location.assign(rutaLogin(location.pathname + location.search))
+  }
   if (!res.ok) {
     const err = (data as ApiError | null)?.error
     throw new ApiRequestError(
@@ -66,6 +71,7 @@ export const api = {
   },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),
+    obtener: (id: string) => request<ProductoHoy>(`/productos/${id}`),
     mios: () => request<MiPublicacion[]>('/productos/mios'),
     actualizar: (id: string, datos: ActualizarProductoInput) =>
       request<Producto>(`/productos/${id}`, { method: 'PATCH', body: json(datos) }),

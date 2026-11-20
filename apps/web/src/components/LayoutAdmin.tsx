@@ -19,10 +19,10 @@ export function LayoutAdmin() {
           Solo para el equipo de Shopsito
         </h1>
         <p className="text-[15px] text-tinta-2">
-          Entra con una cuenta de administrador para gestionar puntos de entrega y reportes.
+          Tu cuenta no es de administrador. Los puntos de entrega y reportes los gestiona el equipo.
         </p>
-        <Boton to="/login" tamano="md">
-          Entrar
+        <Boton to="/" tamano="md">
+          Ver lo de hoy
         </Boton>
       </main>
     )

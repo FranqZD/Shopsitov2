@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { Camera, Clock, Image, Minus, Plus, RefreshCw, X } from 'lucide-react'
-import { ahoraCampus, segundosHastaHora, type MiPublicacion } from '@shopsito/shared'
+import {
+  ahoraCampus,
+  segundosHastaHora,
+  type CategoriaProducto,
+  type MiPublicacion,
+} from '@shopsito/shared'
 import { BarraExistencias } from '../components/BarraExistencias'
 import { Boton } from '../components/Boton'
 import { Chip } from '../components/Chip'
 import { SelectorCantidad } from '../components/SelectorCantidad'
 import { FotoProducto } from '../components/FotoProducto'
 import { api } from '../lib/api'
+import { CATEGORIAS } from '../lib/categorias'
 import { VENTAS } from '../lib/ejemplos'
 import { formatoFaltan, formatoPrecio } from '../lib/formato'
 import { prepararFoto, urlFoto } from '../lib/fotos'
@@ -20,8 +26,6 @@ type EstadoPublicaciones =
   | { tipo: 'error'; mensaje: string }
   | { tipo: 'listo'; publicaciones: MiPublicacion[] }
 
-// TODO: guardar la categoría cuando la API la tenga.
-const CATEGORIAS = ['Comida', 'Bebidas', 'Snacks', 'Artículos', 'Útiles']
 const MAX_DESC = 200
 
 /** Opciones de hora límite: "En 1 h", horas fijas y "Fin del día" (18:00). */
@@ -47,7 +51,7 @@ export function VenderPage() {
   const [descripcion, setDescripcion] = useState('')
   const [precio, setPrecio] = useState('')
   const [cantidad, setCantidad] = useState(6)
-  const [categoria, setCategoria] = useState('Comida')
+  const [categoria, setCategoria] = useState<CategoriaProducto>('comida')
   const [hora, setHora] = useState(horas[1]?.valor ?? horas[0]!.valor)
   const [mensaje, setMensaje] = useState<{ texto: string; ok: boolean } | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -75,12 +79,12 @@ export function VenderPage() {
     setMensaje(null)
     setEnviando(true)
     try {
-      // TODO: guardar la categoría cuando la API la tenga.
       const creado = await api.productos.crear({
         nombre,
         descripcion,
         precio: centavos,
         cantidad,
+        categoria,
         horaLimite: hora,
       })
       let texto = '¡Listo! Ya está en el catálogo.'
@@ -286,12 +290,12 @@ export function VenderPage() {
           <div className="flex flex-wrap gap-2">
             {CATEGORIAS.map((c) => (
               <Chip
-                key={c}
-                activo={categoria === c}
-                onClick={() => setCategoria(c)}
+                key={c.id}
+                activo={categoria === c.id}
+                onClick={() => setCategoria(c.id)}
                 className="text-[15px]"
               >
-                {c}
+                {c.nombre}
               </Chip>
             ))}
           </div>

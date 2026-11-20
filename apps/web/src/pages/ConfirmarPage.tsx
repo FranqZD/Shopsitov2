@@ -20,7 +20,7 @@ import { InsigniaMini } from '../components/Insignia'
 import { api } from '../lib/api'
 import { formatoPrecio, nombreCorto } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
-import { useProductosHoy } from '../lib/useProductosHoy'
+import { abiertoHoy, useProducto } from '../lib/useProducto'
 import { EstadoCarga } from './EstadoCarga'
 
 /** Icono según el nombre del punto (biblioteca, edificio, cafetería). */
@@ -36,7 +36,7 @@ export function ConfirmarPage() {
   const { id } = useParams()
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const { estado, recargar } = useProductosHoy()
+  const { estado, recargar } = useProducto(id ?? '')
   const [puntos, setPuntos] = useState<PuntoEntrega[] | null>(null)
   const [puntoId, setPuntoId] = useState<string | null>(null)
   const [nota, setNota] = useState('')
@@ -56,8 +56,8 @@ export function ConfirmarPage() {
   }, [])
 
   if (estado.tipo !== 'listo') return <EstadoCarga estado={estado} recargar={recargar} />
-  const p = estado.productos.find((x) => x.id === id)
-  if (!p || p.cantidad === 0)
+  const p = estado.producto
+  if (p.cantidad === 0 || p.estado !== 'disponible' || !abiertoHoy(p, new Date()))
     return <EstadoCarga estado={{ tipo: 'no-encontrado' }} recargar={recargar} />
 
   const cantidad = Math.min(Math.max(Number(params.get('cantidad')) || 1, 1), p.cantidad)

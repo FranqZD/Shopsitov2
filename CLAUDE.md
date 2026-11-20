@@ -51,15 +51,15 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 
 ## Estado actual (actualízalo cuando implementes algo)
 
-**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `POST /api/productos` (publicar), `GET /api/productos/mios` (lo publicado hoy con vendidos, ingresos y cantidad inicial calculada), `PATCH`/`DELETE /api/productos/:id` (solo el dueño; quitar algo con pedidos lo deja agotado en vez de borrarlo), `POST /api/productos/:id/foto` (R2) y `GET /api/fotos/productos/:id/:archivo`, CRUD de `/api/puntos-entrega`, auth completo (registro que deja la sesión abierta, login, logout, `POST /auth/institucional` → insignia; registrarse con correo de la uni también la da), middleware JWT, validación y errores, esquema D1 con migración inicial y seed.
+**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `GET /api/productos/:id`, categoría de producto, `POST /api/productos` (publicar), `GET /api/productos/mios` (lo publicado hoy con vendidos, ingresos y cantidad inicial calculada), `PATCH`/`DELETE /api/productos/:id` (solo el dueño; quitar algo con pedidos lo deja agotado en vez de borrarlo), `POST /api/productos/:id/foto` (R2) y `GET /api/fotos/productos/:id/:archivo`, CRUD de `/api/puntos-entrega`, auth completo (registro que deja la sesión abierta, login, logout, `POST /auth/institucional` → insignia; registrarse con correo de la uni también la da), middleware JWT (todo exige sesión salvo `health`, `login`, `registro` y las fotos, que se cargan con `<img>`), validación y errores, esquema D1 con migraciones y seed.
 
-**Backend en 501 (rutas y validación ya existen):** usuarios, detalle de producto, pedidos (todo), calificaciones, notificaciones, reportes.
+**Backend en 501 (rutas y validación ya existen):** usuarios, pedidos (todo), calificaciones, notificaciones, reportes.
 
-**Frontend:** todas las pantallas existen con el diseño final y son responsive. Usan datos reales: catálogo, detalle de producto (lo busca en el catálogo del día), confirmar (puntos reales), vender (publicar con foto de cámara o galería; editar, quitar y agregar más en "Lo que vendes hoy"), entrar y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Registro y entrar usan la API real; confirmar pedido llama a la API y muestra el 501. Aún no hay pantalla para el correo institucional.
+**Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), vender (publicar con categoría y foto de cámara o galería; editar, quitar y agregar más en "Lo que vendes hoy"), entrar, registro y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Confirmar pedido llama a la API y muestra el 501. Aún no hay pantalla para el correo institucional.
 
-**Datos que el diseño muestra y el modelo aún no tiene:** categoría del producto, hora de publicación, calificación del vendedor, nota del pedido, método de pago.
+**Datos que el diseño muestra y el modelo aún no tiene:** hora de publicación, calificación del vendedor, nota del pedido, método de pago.
 
-**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor), luego categoría del producto.
+**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor).
 
 Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts` que ya no se usen y sus `TODO`.
 
@@ -75,7 +75,7 @@ Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts
 
 ## Git
 
-- Ramas desde `main`: `feature/SH-XX-descripcion` y `fix/descripcion`.
+- Ramas desde `main`: `feature/descripcion` (lo que se trabaja, sin número de ticket) y `fix/descripcion`.
 - Commits pequeños con Conventional Commits en español: `feat(api): …`, `fix(web): …`, `chore: …`, `docs: …`, `test: …`.
 - No hacer push ni abrir PR salvo que se pida.
 - Sin líneas de atribución: nada de `Co-Authored-By: Claude…` ni "Generated with Claude Code" en commits ni PRs.

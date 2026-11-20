@@ -7,6 +7,9 @@ export type TipoCodigo = (typeof TIPOS_CODIGO)[number]
 export const ESTADOS_PRODUCTO = ['disponible', 'agotado'] as const
 export type EstadoProducto = (typeof ESTADOS_PRODUCTO)[number]
 
+export const CATEGORIAS_PRODUCTO = ['comida', 'bebidas', 'snacks', 'articulos', 'utiles'] as const
+export type CategoriaProducto = (typeof CATEGORIAS_PRODUCTO)[number]
+
 export const ESTADOS_PEDIDO = [
   'pendiente',
   'aceptado',
