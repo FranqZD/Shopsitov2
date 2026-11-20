@@ -1,16 +1,17 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Eye, EyeOff } from 'lucide-react'
 import { Boton } from '../components/Boton'
 import { LogoShopsito } from '../components/LogoShopsito'
 import { api } from '../lib/api'
-import { guardarSesion } from '../lib/sesion'
+import { destinoSeguro, guardarSesion } from '../lib/sesion'
 
 const CAMPO =
   'h-[54px] w-full rounded-[18px] bg-tarjeta px-[18px] text-base text-tinta shadow-tarjeta outline-none focus:ring-2 focus:ring-azul'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [params] = useSearchParams()
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
   const [ver, setVer] = useState(false)
@@ -34,7 +35,11 @@ export function LoginPage() {
           api.auth.login({ correo, password }).then(
             (sesion) => {
               guardarSesion(sesion)
-              navigate(sesion.usuario.rol === 'admin' ? '/admin' : '/')
+              navigate(
+                destinoSeguro(params.get('volver')) ??
+                  (sesion.usuario.rol === 'admin' ? '/admin' : '/'),
+                { replace: true },
+              )
             },
             (err: Error) => setError(err.message),
           )

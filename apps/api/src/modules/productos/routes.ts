@@ -30,7 +30,7 @@ const conVendedor = (c: Context<AppEnv>) =>
 
 export const productosRoutes = new Hono<AppEnv>()
   // Catálogo del día: sin cron, se filtra por fecha y hora límite en hora del campus.
-  .get('/hoy', async (c) => {
+  .get('/hoy', requireAuth, async (c) => {
     const { fecha, hora } = ahoraCampus()
     const filas = await conVendedor(c)
       .where(
@@ -45,7 +45,7 @@ export const productosRoutes = new Hono<AppEnv>()
     return c.json<ProductoHoy[]>(filas.map((f) => ({ ...f.producto, vendedor: f.vendedor })))
   })
   // Sin filtrar por fecha ni estado: la pantalla de detalle decide si se puede pedir.
-  .get('/:id', validar('param', idParamSchema), async (c) => {
+  .get('/:id', requireAuth, validar('param', idParamSchema), async (c) => {
     const { id } = c.req.valid('param')
     const [fila] = await conVendedor(c).where(eq(productos.id, id))
     if (!fila) throw notFound('Producto')

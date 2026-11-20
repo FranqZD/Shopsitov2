@@ -20,8 +20,8 @@ const listarQuerySchema = z.object({
 })
 
 export const puntosEntregaRoutes = new Hono<AppEnv>()
-  // Público: los compradores necesitan la lista para elegir dónde recibir.
-  .get('/', validar('query', listarQuerySchema), async (c) => {
+  // Cualquier usuario con sesión: los compradores necesitan la lista para elegir dónde recibir.
+  .get('/', requireAuth, validar('query', listarQuerySchema), async (c) => {
     const { activo } = c.req.valid('query')
     const db = getDb(c)
     const filas = await db
@@ -32,7 +32,7 @@ export const puntosEntregaRoutes = new Hono<AppEnv>()
     return c.json<PuntoEntrega[]>(filas)
   })
 
-  .get('/:id', validar('param', idParamSchema), async (c) => {
+  .get('/:id', requireAuth, validar('param', idParamSchema), async (c) => {
     const { id } = c.req.valid('param')
     const punto = await getDb(c).query.puntosEntrega.findFirst({ where: eq(puntosEntrega.id, id) })
     if (!punto) throw notFound('Punto de entrega')

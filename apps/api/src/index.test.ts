@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { sign } from 'hono/jwt'
 import app from './index'
 import type { Bindings } from './env'
+import { JWT_ALG } from './middleware/auth'
 
 // Sin D1/R2 reales: estas pruebas solo cubren rutas que no tocan la base.
 const env = { JWT_SECRET: 'test' } as Bindings
@@ -34,8 +36,26 @@ describe('api', () => {
     expect(await res.json()).toMatchObject({ error: { code: 'VALIDATION_ERROR' } })
   })
 
+  it.each([
+    '/api/productos/hoy',
+    '/api/productos/00000000-0000-4000-8000-000000000201',
+    '/api/puntos-entrega',
+  ])('GET %s exige sesión', async (ruta) => {
+    const res = await app.request(ruta, {}, env)
+    expect(res.status).toBe(401)
+  })
+
   it('GET /api/productos/:id valida que el id sea UUID', async () => {
-    const res = await app.request('/api/productos/no-es-uuid', {}, env)
+    const token = await sign(
+      { sub: 'u', rol: 'usuario', exp: Math.floor(Date.now() / 1000) + 60 },
+      env.JWT_SECRET,
+      JWT_ALG,
+    )
+    const res = await app.request(
+      '/api/productos/no-es-uuid',
+      { headers: { authorization: `Bearer ${token}` } },
+      env,
+    )
     expect(res.status).toBe(400)
     expect(await res.json()).toMatchObject({ error: { code: 'VALIDATION_ERROR' } })
   })

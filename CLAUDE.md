@@ -51,11 +51,11 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 
 ## Estado actual (actualízalo cuando implementes algo)
 
-**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `GET /api/productos/:id`, categoría de producto, CRUD de `/api/puntos-entrega`, `POST /api/auth/login` (mínimo) y `logout`, middleware JWT, validación y errores, esquema D1 con migración inicial y seed.
+**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `GET /api/productos/:id`, categoría de producto, CRUD de `/api/puntos-entrega`, `POST /api/auth/login` (mínimo) y `logout`, middleware JWT (todo exige sesión salvo `health`, `login` y el registro), validación y errores, esquema D1 con migración inicial y seed.
 
 **Backend en 501 (rutas y validación ya existen):** registro/verificación/institucional, usuarios, productos (crear, editar, borrar, foto R2), pedidos (todo), calificaciones, notificaciones, reportes.
 
-**Frontend:** todas las pantallas existen con el diseño final y son responsive. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), entrar y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Registro, verificar, publicar y confirmar pedido ya llaman a la API y muestran el 501.
+**Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), entrar y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Registro, verificar, publicar y confirmar pedido ya llaman a la API y muestran el 501.
 
 **Datos que el diseño muestra y el modelo aún no tiene:** cantidad inicial ("Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido, método de pago.
 
