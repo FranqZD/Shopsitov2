@@ -33,4 +33,10 @@ describe('api', () => {
     expect(res.status).toBe(400)
     expect(await res.json()).toMatchObject({ error: { code: 'VALIDATION_ERROR' } })
   })
+
+  it('GET /api/productos/:id valida que el id sea UUID', async () => {
+    const res = await app.request('/api/productos/no-es-uuid', {}, env)
+    expect(res.status).toBe(400)
+    expect(await res.json()).toMatchObject({ error: { code: 'VALIDATION_ERROR' } })
+  })
 })

@@ -22,11 +22,23 @@ describe('segundosHastaHora', () => {
 })
 
 describe('crearProductoSchema', () => {
+  it('exige una categoría conocida', () => {
+    const r = crearProductoSchema.safeParse({
+      nombre: 'Tamal',
+      precio: 2500,
+      cantidad: 3,
+      categoria: 'ropa',
+      horaLimite: '14:00',
+    })
+    expect(r.success).toBe(false)
+  })
+
   it('rechaza precios con decimales (se manejan en centavos)', () => {
     const r = crearProductoSchema.safeParse({
       nombre: 'Tamal',
       precio: 25.5,
       cantidad: 3,
+      categoria: 'comida',
       horaLimite: '14:00',
     })
     expect(r.success).toBe(false)
@@ -37,6 +49,7 @@ describe('crearProductoSchema', () => {
       nombre: 'Tamal',
       precio: 2500,
       cantidad: 3,
+      categoria: 'comida',
       horaLimite: '14:00',
     })
     expect(r.success).toBe(true)

@@ -68,6 +68,7 @@ export const api = {
   },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),
+    obtener: (id: string) => request<ProductoHoy>(`/productos/${id}`),
     crear: (datos: CrearProductoInput) =>
       request<Producto>('/productos', { method: 'POST', body: json(datos) }),
   },

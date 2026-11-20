@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import {
+  CATEGORIAS_PRODUCTO,
   ESTADOS_PEDIDO,
   ESTADOS_PRODUCTO,
   ESTADOS_REPORTE,
@@ -47,6 +48,7 @@ export const productos = sqliteTable(
     descripcion: text('descripcion').notNull().default(''),
     precio: integer('precio').notNull(),
     cantidad: integer('cantidad').notNull(),
+    categoria: text('categoria', { enum: CATEGORIAS_PRODUCTO }).notNull().default('comida'),
     fotoKey: text('foto_key'),
     /** YYYY-MM-DD en hora del campus (America/Mexico_City). */
     fecha: text('fecha').notNull(),

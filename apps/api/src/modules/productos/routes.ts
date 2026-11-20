@@ -1,4 +1,4 @@
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
 import { and, eq, gt, asc } from 'drizzle-orm'
 import {
   actualizarProductoSchema,
@@ -10,25 +10,29 @@ import {
 import type { AppEnv } from '../../env'
 import { productos, usuarios } from '../../db/schema'
 import { getDb } from '../../lib/db'
-import { notImplemented } from '../../lib/errors'
+import { notFound, notImplemented } from '../../lib/errors'
 import { validar } from '../../lib/validator'
 import { requireAuth } from '../../middleware/auth'
+
+/** Producto con los datos públicos de su vendedor (la forma de `ProductoHoy`). */
+const conVendedor = (c: Context<AppEnv>) =>
+  getDb(c)
+    .select({
+      producto: productos,
+      vendedor: {
+        id: usuarios.id,
+        nombre: usuarios.nombre,
+        insigniaComunidad: usuarios.insigniaComunidad,
+      },
+    })
+    .from(productos)
+    .innerJoin(usuarios, eq(productos.vendedorId, usuarios.id))
 
 export const productosRoutes = new Hono<AppEnv>()
   // Catálogo del día: sin cron, se filtra por fecha y hora límite en hora del campus.
   .get('/hoy', async (c) => {
     const { fecha, hora } = ahoraCampus()
-    const filas = await getDb(c)
-      .select({
-        producto: productos,
-        vendedor: {
-          id: usuarios.id,
-          nombre: usuarios.nombre,
-          insigniaComunidad: usuarios.insigniaComunidad,
-        },
-      })
-      .from(productos)
-      .innerJoin(usuarios, eq(productos.vendedorId, usuarios.id))
+    const filas = await conVendedor(c)
       .where(
         and(
           eq(productos.fecha, fecha),
@@ -40,7 +44,13 @@ export const productosRoutes = new Hono<AppEnv>()
       .orderBy(asc(productos.horaLimite))
     return c.json<ProductoHoy[]>(filas.map((f) => ({ ...f.producto, vendedor: f.vendedor })))
   })
-  .get('/:id', validar('param', idParamSchema), notImplemented)
+  // Sin filtrar por fecha ni estado: la pantalla de detalle decide si se puede pedir.
+  .get('/:id', validar('param', idParamSchema), async (c) => {
+    const { id } = c.req.valid('param')
+    const [fila] = await conVendedor(c).where(eq(productos.id, id))
+    if (!fila) throw notFound('Producto')
+    return c.json<ProductoHoy>({ ...fila.producto, vendedor: fila.vendedor })
+  })
   .post('/', requireAuth, validar('json', crearProductoSchema), notImplemented)
   .patch(
     '/:id',

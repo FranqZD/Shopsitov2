@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { centavosSchema, horaSchema } from './comun'
-import type { EstadoProducto } from '../enums'
+import { CATEGORIAS_PRODUCTO, type CategoriaProducto, type EstadoProducto } from '../enums'
 
 export const crearProductoSchema = z.object({
   nombre: z.string().trim().min(2).max(80),
   descripcion: z.string().trim().max(500).default(''),
   precio: centavosSchema,
   cantidad: z.int().positive(),
+  categoria: z.enum(CATEGORIAS_PRODUCTO),
   horaLimite: horaSchema,
 })
 export type CrearProductoInput = z.infer<typeof crearProductoSchema>
@@ -21,6 +22,7 @@ export type Producto = {
   descripcion: string
   precio: number
   cantidad: number
+  categoria: CategoriaProducto
   fotoKey: string | null
   fecha: string
   horaLimite: string

@@ -4,7 +4,7 @@
 // Uso: pnpm db:seed (aplica sobre la D1 simulada en .wrangler/, nunca en la nube).
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { ahoraCampus } from '@shopsito/shared'
+import { ahoraCampus, type CategoriaProducto } from '@shopsito/shared'
 import { hashPassword } from '../src/lib/password'
 
 type Valor = string | number | boolean | null
@@ -69,6 +69,7 @@ type Producto = {
   descripcion?: string
   precio: number
   cantidad: number
+  categoria: CategoriaProducto
   foto: string
   /** Minutos desde ahora hasta la hora límite. */
   cierraEn: number
@@ -82,6 +83,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Café de olla 12 oz',
     precio: 2000,
     cantidad: 3,
+    categoria: 'bebidas',
     foto: 'cafe',
     cierraEn: 18,
     descripcion: 'Con canela y piloncillo, recién hecho. Vaso de 12 oz con tapa.',
@@ -91,6 +93,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Chilaquiles verdes en vaso',
     precio: 4500,
     cantidad: 2,
+    categoria: 'comida',
     foto: 'chilaquiles',
     cierraEn: 28,
     descripcion:
@@ -101,6 +104,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Molletes con pico de gallo',
     precio: 3500,
     cantidad: 4,
+    categoria: 'comida',
     foto: 'molletes',
     cierraEn: 48,
     descripcion:
@@ -111,6 +115,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Tejuino con nieve de limón 500 ml',
     precio: 3000,
     cantidad: 6,
+    categoria: 'bebidas',
     foto: 'tejuino',
     cierraEn: 108,
   },
@@ -119,6 +124,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Conchas de vainilla',
     precio: 1500,
     cantidad: 0,
+    categoria: 'snacks',
     foto: 'conchas',
     cierraEn: 108,
     descripcion: 'Conchas de vainilla de la panadería de mi tía, horneadas hoy en la mañana.',
@@ -128,6 +134,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Galletas de avena y chocolate (paquete de 3)',
     precio: 2500,
     cantidad: 7,
+    categoria: 'snacks',
     foto: 'galletas',
     cierraEn: 198,
   },
@@ -136,6 +143,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Agua de jamaica 1 L',
     precio: 2500,
     cantidad: 0,
+    categoria: 'bebidas',
     foto: 'jamaica',
     cierraEn: 168,
   },
@@ -144,6 +152,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Bata de laboratorio talla M',
     precio: 15000,
     cantidad: 1,
+    categoria: 'articulos',
     foto: 'bata',
     cierraEn: 408,
   },
@@ -152,6 +161,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Calculadora Casio fx-991 usada',
     precio: 28000,
     cantidad: 1,
+    categoria: 'utiles',
     foto: 'calculadora',
     cierraEn: 468,
   },
@@ -161,6 +171,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Molletes (cerrado)',
     precio: 3000,
     cantidad: 5,
+    categoria: 'comida',
     foto: 'molletes',
     cierraEn: 0,
     horaLimite: '00:00',
@@ -170,6 +181,7 @@ const PRODUCTOS: Producto[] = [
     nombre: 'Pan de ayer',
     precio: 1000,
     cantidad: 4,
+    categoria: 'snacks',
     foto: 'conchas',
     cierraEn: 0,
     fecha: ayer,
@@ -222,6 +234,7 @@ const sql = [
       descripcion: p.descripcion ?? '',
       precio: p.precio,
       cantidad: p.cantidad,
+      categoria: p.categoria,
       // Ilustraciones de ejemplo: el frontend las sirve desde /productos/<archivo>.svg.
       foto_key: `ejemplo/${p.foto}.svg`,
       fecha: p.fecha ?? hoy,
