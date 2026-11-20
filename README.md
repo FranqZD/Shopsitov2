@@ -170,16 +170,17 @@ El diseño que ya está en la app es la referencia: tokens, componentes base y p
 
 - `GET /api/health`
 - `GET /api/productos/hoy` (filtro del día por zona horaria del campus, con datos del vendedor)
+- `POST /api/productos` (publicar para hoy; la hora límite debe ser posterior a la actual) `GET /api/productos/mios` (lo que publicaste hoy con vendidos e ingresos), `PATCH`/`DELETE /api/productos/:id` (solo el dueño) y foto en R2 (`POST /api/productos/:id/foto`, se sirve en `GET /api/fotos/…`)
 - `/api/puntos-entrega`: CRUD completo (lectura pública; crear/editar/borrar solo admin)
 - `/api/auth`: `registro` (sin código de verificación; responde con la sesión abierta), `login`, `logout` (sin estado) e `institucional` (liga un correo `@universidad.edu.mx` y da la insignia de comunidad; registrarse con ese correo también la da)
   - No se mandan correos ni códigos de verificación
 - Middleware JWT (`requireAuth`, `requireAdmin`), validación Zod y errores centralizados
-- Web con el diseño aprobado. Con datos reales: catálogo (`/`), detalle (`/producto/:id`), confirmar (puntos de entrega reales), entrar (`/login`) y admin de puntos de entrega (`/admin`)
+- Web con el diseño aprobado. Con datos reales: catálogo (`/`), detalle (`/producto/:id`), confirmar (puntos de entrega reales), vender (`/vender`: publicar con foto, editar y quitar), entrar (`/login`) y admin de puntos de entrega (`/admin`)
 
 **Stub (`501 Not Implemented`, con validación ya conectada)**
 
-- usuarios, resto de productos (detalle, crear, editar, borrar, foto en R2), pedidos, calificaciones, notificaciones, reportes
-- Pantallas web con datos de ejemplo (`lib/ejemplos.ts`) hasta que exista su API: mis pedidos y detalle, calificar, vender y mis ventas, perfil (reseñas y estadísticas), notificaciones, reportes de admin. Registro y entrar ya usan la API real; publicar y confirmar pedido llaman a la API y muestran su respuesta 501.
-- Datos que el diseño muestra pero la API aún no tiene: categoría del producto, cantidad inicial (barra "Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido y método de pago.
+- usuarios, detalle de producto, pedidos, calificaciones, notificaciones, reportes
+- Pantallas web con datos de ejemplo (`lib/ejemplos.ts`) hasta que exista su API: mis pedidos y detalle, calificar, mis ventas, perfil (reseñas y estadísticas), notificaciones, reportes de admin. Registro y entrar ya usan la API real; confirmar pedido llama a la API y muestra su respuesta 501.
+- Datos que el diseño muestra pero la API aún no tiene: categoría del producto, hora de publicación, calificación del vendedor, nota del pedido y método de pago.
 
 **Fuera de alcance por ahora**: notificaciones en tiempo real (hay un TODO), Terraform, CI y recursos en la nube.

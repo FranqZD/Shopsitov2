@@ -212,30 +212,6 @@ export const VENTAS = {
   ],
 }
 
-// TODO: reemplazar por los productos del vendedor (GET /api/productos?vendedor=me) cuando exista.
-export const MIS_PUBLICACIONES = [
-  {
-    id: 'pub-1',
-    nombre: 'Molletes con pico de gallo',
-    foto: foto('molletes'),
-    precio: 3500,
-    hasta: '11:00',
-    quedan: 4,
-    total: 12,
-    vendidos: 8,
-  },
-  {
-    id: 'pub-2',
-    nombre: 'Agua de jamaica 1 L',
-    foto: foto('jamaica'),
-    precio: 2500,
-    hasta: '13:00',
-    quedan: 0,
-    total: 6,
-    vendidos: 6,
-  },
-]
-
 export type TipoNotificacion = 'ok' | 'reloj' | 'bolsa' | 'x' | 'estrella' | 'insignia'
 
 // TODO: reemplazar por GET /api/notificaciones.

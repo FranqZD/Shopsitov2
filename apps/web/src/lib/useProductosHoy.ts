@@ -10,6 +10,11 @@ type Estado =
 // Último resultado en memoria para no mostrar skeletons al regresar del detalle.
 let cache: ProductoHoy[] | null = null
 
+/** Olvida el catálogo en memoria (p. ej. al publicar) para que se vuelva a pedir. */
+export function invalidarProductosHoy() {
+  cache = null
+}
+
 /** Producto del último catálogo cargado, para pintar el detalle sin esperar a la API. */
 export const productoEnCache = (id: string) => cache?.find((p) => p.id === id)
 

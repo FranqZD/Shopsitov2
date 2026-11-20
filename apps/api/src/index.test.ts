@@ -88,4 +88,52 @@ describe('api', () => {
     })
     expect(res.status).toBe(401)
   })
+
+  it('publicar, editar, quitar y ver mis publicaciones exigen token', async () => {
+    expect((await app.request('/api/productos/mios', {}, env)).status).toBe(401)
+    const res = await post('/api/productos', {
+      nombre: 'Molletes',
+      precio: 3500,
+      cantidad: 6,
+      horaLimite: '23:59',
+    })
+    expect(res.status).toBe(401)
+    const id = crypto.randomUUID()
+    expect((await app.request(`/api/productos/${id}`, { method: 'DELETE' }, env)).status).toBe(401)
+    const editar = await app.request(
+      `/api/productos/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ precio: 4000 }),
+        headers: { 'content-type': 'application/json' },
+      },
+      env,
+    )
+    expect(editar.status).toBe(401)
+  })
+
+  it('no deja publicar con una hora límite que ya pasó', async () => {
+    const token = await sign(
+      { sub: crypto.randomUUID(), rol: 'usuario', exp: Math.floor(Date.now() / 1000) + 60 },
+      env.JWT_SECRET,
+    )
+    const res = await app.request(
+      '/api/productos',
+      {
+        method: 'POST',
+        // '00:00' nunca es posterior a la hora actual, así que falla antes de tocar la base.
+        body: JSON.stringify({
+          nombre: 'Molletes',
+          precio: 3500,
+          cantidad: 6,
+          categoria: 'comida',
+          horaLimite: '00:00',
+        }),
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+      },
+      env,
+    )
+    expect(res.status).toBe(400)
+    expect(await res.json()).toMatchObject({ error: { code: 'HORA_LIMITE_PASADA' } })
+  })
 })

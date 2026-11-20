@@ -51,15 +51,15 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 
 ## Estado actual (actualízalo cuando implementes algo)
 
-**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `GET /api/productos/:id`, categoría de producto, CRUD de `/api/puntos-entrega`, auth completo (registro que deja la sesión abierta, login, logout, `POST /auth/institucional` → insignia; registrarse con correo de la uni también la da), middleware JWT (todo exige sesión salvo `health`, `login` y `registro`), validación y errores, esquema D1 con migraciones y seed.
+**Backend implementado:** `GET /api/health`, `GET /api/productos/hoy`, `GET /api/productos/:id`, categoría de producto, `POST /api/productos` (publicar), `GET /api/productos/mios` (lo publicado hoy con vendidos, ingresos y cantidad inicial calculada), `PATCH`/`DELETE /api/productos/:id` (solo el dueño; quitar algo con pedidos lo deja agotado en vez de borrarlo), `POST /api/productos/:id/foto` (R2) y `GET /api/fotos/productos/:id/:archivo`, CRUD de `/api/puntos-entrega`, auth completo (registro que deja la sesión abierta, login, logout, `POST /auth/institucional` → insignia; registrarse con correo de la uni también la da), middleware JWT (todo exige sesión salvo `health`, `login`, `registro` y las fotos, que se cargan con `<img>`), validación y errores, esquema D1 con migraciones y seed.
 
-**Backend en 501 (rutas y validación ya existen):** usuarios, productos (crear, editar, borrar, foto R2), pedidos (todo), calificaciones, notificaciones, reportes.
+**Backend en 501 (rutas y validación ya existen):** usuarios, pedidos (todo), calificaciones, notificaciones, reportes.
 
-**Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), entrar, registro y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Publicar y confirmar pedido llaman a la API y muestran el 501. Aún no hay pantalla para el correo institucional.
+**Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), vender (publicar con categoría y foto de cámara o galería; editar, quitar y agregar más en "Lo que vendes hoy"), entrar, registro y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Confirmar pedido llama a la API y muestra el 501. Aún no hay pantalla para el correo institucional.
 
-**Datos que el diseño muestra y el modelo aún no tiene:** cantidad inicial ("Quedan 4 de 12"), hora de publicación, calificación del vendedor, nota del pedido, método de pago.
+**Datos que el diseño muestra y el modelo aún no tiene:** hora de publicación, calificación del vendedor, nota del pedido, método de pago.
 
-**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor), luego publicar productos.
+**Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor).
 
 Al implementar un endpoint, conecta su pantalla: quita los datos de `ejemplos.ts` que ya no se usen y sus `TODO`.
 
