@@ -6,6 +6,7 @@ import {
   segundosHastaHora,
   type CategoriaProducto,
   type MiPublicacion,
+  type PedidoVenta,
 } from '@shopsito/shared'
 import { BarraExistencias } from '../components/BarraExistencias'
 import { Boton } from '../components/Boton'
@@ -14,7 +15,6 @@ import { SelectorCantidad } from '../components/SelectorCantidad'
 import { FotoProducto } from '../components/FotoProducto'
 import { api } from '../lib/api'
 import { CATEGORIAS } from '../lib/categorias'
-import { VENTAS } from '../lib/ejemplos'
 import { formatoFaltan, formatoPrecio } from '../lib/formato'
 import { prepararFoto, urlFoto } from '../lib/fotos'
 import { useAhora } from '../lib/useAhora'
@@ -69,6 +69,15 @@ export function VenderPage() {
   }, [setMias])
 
   useEffect(cargarMias, [cargarMias])
+
+  // Solo para el contador de "Mis ventas"; si falla, simplemente no se muestra.
+  const [ventas, setVentas] = useState<PedidoVenta[]>([])
+  useEffect(() => {
+    api.pedidos.ventas().then(setVentas, () => setVentas([]))
+  }, [])
+  const nuevos = ventas.filter(
+    (p) => p.estado === 'pendiente' && segundosHastaHora(p.horaLimite, ahora) > 0,
+  ).length
 
   const publicar = async () => {
     const centavos = aCentavos(precio)
@@ -129,10 +138,11 @@ export function VenderPage() {
           className="inline-flex h-11 items-center gap-2 rounded-full bg-azul-50 pr-2.5 pl-4 text-[14.5px] font-bold text-azul"
         >
           Mis ventas
-          {/* TODO: número de pedidos nuevos (GET /api/pedidos/ventas). */}
-          <span className="flex size-[22px] items-center justify-center rounded-full bg-mango text-xs font-extrabold text-sobre-mango">
-            {VENTAS.nuevo ? 1 : 0}
-          </span>
+          {nuevos > 0 && (
+            <span className="flex size-[22px] items-center justify-center rounded-full bg-mango text-xs font-extrabold text-sobre-mango">
+              {nuevos}
+            </span>
+          )}
         </Link>
       </div>
 

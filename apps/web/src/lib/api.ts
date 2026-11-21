@@ -14,6 +14,7 @@ import type {
   LoginInput,
   MiPublicacion,
   Pedido,
+  PedidoVenta,
   PerfilUsuario,
   Producto,
   RegistroInput,
@@ -103,6 +104,10 @@ export const api = {
   pedidos: {
     crear: (datos: CrearPedidoInput) =>
       request<Pedido>('/pedidos', { method: 'POST', body: json(datos) }),
+    ventas: () => request<PedidoVenta[]>('/pedidos/ventas'),
+    aceptar: (id: string) => request<Pedido>(`/pedidos/${id}/aceptar`, { method: 'POST' }),
+    rechazar: (id: string) => request<Pedido>(`/pedidos/${id}/rechazar`, { method: 'POST' }),
+    entregar: (id: string) => request<Pedido>(`/pedidos/${id}/entregar`, { method: 'POST' }),
   },
   reportes: {
     crear: (datos: CrearReporteInput) =>

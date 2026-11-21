@@ -43,6 +43,7 @@ describe('api', () => {
     '/api/usuarios/me',
     '/api/usuarios/00000000-0000-4000-8000-000000000004',
     '/api/calificaciones/vendedor/00000000-0000-4000-8000-000000000004',
+    '/api/pedidos/ventas',
   ])('GET %s exige sesión', async (ruta) => {
     const res = await app.request(ruta, {}, env)
     expect(res.status).toBe(401)
@@ -114,6 +115,27 @@ describe('api', () => {
     )
     expect(editar.status).toBe(401)
   })
+
+  it.each(['aceptar', 'rechazar', 'entregar'])(
+    'POST /api/pedidos/:id/%s exige sesión y un id válido',
+    async (accion) => {
+      const id = '00000000-0000-4000-8000-000000000401'
+      expect(
+        (await app.request(`/api/pedidos/${id}/${accion}`, { method: 'POST' }, env)).status,
+      ).toBe(401)
+      const token = await sign(
+        { sub: crypto.randomUUID(), rol: 'usuario', exp: Math.floor(Date.now() / 1000) + 60 },
+        env.JWT_SECRET,
+        JWT_ALG,
+      )
+      const res = await app.request(
+        `/api/pedidos/no-es-uuid/${accion}`,
+        { method: 'POST', headers: { authorization: `Bearer ${token}` } },
+        env,
+      )
+      expect(res.status).toBe(400)
+    },
+  )
 
   it('no deja publicar con una hora límite que ya pasó', async () => {
     const token = await sign(

@@ -181,37 +181,6 @@ export const PEDIDOS: PedidoEjemplo[] = [
 
 export const ACTIVOS: EstadoPedido[] = ['pendiente', 'aceptado']
 
-// TODO: reemplazar por GET /api/pedidos/ventas.
-export const VENTAS = {
-  nuevo: {
-    comprador: 'Ana Ramírez',
-    insignia: true,
-    hace: 'Hace 1 min',
-    producto: 'Molletes con pico de gallo',
-    foto: foto('molletes'),
-    cantidad: 2,
-    total: 7000,
-    punto: 'Biblioteca, entrada principal',
-    nota: 'Sin cebolla en el pico de gallo, porfa.',
-    segundosParaResponder: 2699,
-  },
-  porEntregar: [
-    {
-      id: 'luis',
-      nombre: 'Luis Ángel Torres',
-      que: '1 × Molletes',
-      punto: 'Edificio T, PB',
-      hasta: '11:00',
-      total: 3500,
-    },
-  ],
-  entregados: [
-    { nombre: 'Sofía Navarro', que: '2 × Molletes', hora: '9:40', total: 7000 },
-    { nombre: 'Jorge Castillo', que: '3 × Agua de jamaica', hora: '9:15', total: 7500 },
-    { nombre: 'Andrea Gutiérrez', que: '3 × Agua de jamaica', hora: '8:50', total: 7500 },
-  ],
-}
-
 export type TipoNotificacion = 'ok' | 'reloj' | 'bolsa' | 'x' | 'estrella' | 'insignia'
 
 // TODO: reemplazar por GET /api/notificaciones.
