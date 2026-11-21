@@ -2,13 +2,14 @@
 
 Marketplace del día para la comunidad de una universidad. Cualquiera publica lo que trae **hoy** (comida, snacks, artículos) con precio, cantidad y hora límite; otros lo piden y lo recogen en puntos de entrega del campus. El vendedor acepta y entrega; el comprador sigue el estado y califica. Registro directo, sin códigos de verificación; con correo institucional se gana la insignia "Comunidad". Un admin gestiona puntos de entrega y revisa reportes.
 
-Proyecto escolar de 3 personas. Prioridad: simple y que funcione de punta a punta en local. **No** crear recursos en la nube, Terraform ni CI salvo que se pida.
+Proyecto escolar de 3 personas. Prioridad: simple y que funcione de punta a punta en local. **No** crear recursos en la nube ni CI salvo que se pida (no corras `terraform apply` ni `infra/desplegar.sh` por tu cuenta).
 
 Guías por área (se cargan al trabajar en esa carpeta):
 
 - Backend: [`apps/api/CLAUDE.md`](apps/api/CLAUDE.md)
 - Frontend: [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md)
 - Para humanos: [`README.md`](README.md)
+- Despliegue en Cloudflare: [`infra/README.md`](infra/README.md)
 
 ## Stack
 
@@ -19,6 +20,7 @@ Monorepo con pnpm workspaces (pnpm 10.34, fijado en `packageManager`).
 | `apps/web`        | React 19 + Vite 8 + TypeScript + React Router 8 + Tailwind v4 + lucide-react   |
 | `apps/api`        | Cloudflare Worker con Hono, `wrangler.toml`, D1 (SQLite) con Drizzle, R2 fotos |
 | `packages/shared` | Enums, esquemas Zod, tipos y helpers de fecha compartidos (se consume como TS) |
+| `infra/`          | Terraform (módulo + ambientes `dev`/`prod`) y `desplegar.sh` para Cloudflare   |
 
 TypeScript se queda en **~6.0**: typescript-eslint aún no soporta TS 7.
 
@@ -56,6 +58,8 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 **Backend en 501 (rutas y validación ya existen):** usuarios, pedidos (todo), calificaciones, notificaciones, reportes.
 
 **Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), vender (publicar con categoría y foto de cámara o galería; editar, quitar y agregar más en "Lo que vendes hoy"), entrar, registro y admin de puntos. El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Confirmar pedido llama a la API y muestra el 501. Aún no hay pantalla para el correo institucional.
+
+**Infra:** Terraform en `infra/terraform` crea por ambiente (dev, prod) una D1, un bucket R2, el Worker (sube `apps/api/dist/index.js` con bindings `DB`, `FOTOS`, `JWT_SECRET`) y un proyecto de Pages cuya función `apps/web/functions/api/[[path]].ts` reenvía `/api/*` al Worker por service binding (mismo origen, sin CORS). Migraciones remotas y subida de la web van con Wrangler desde `infra/desplegar.sh`. Si agregas un binding o secreto al Worker, agrégalo también en `infra/terraform/modules/shopsito/main.tf`.
 
 **Datos que el diseño muestra y el modelo aún no tiene:** hora de publicación, calificación del vendedor, nota del pedido, método de pago.
 
