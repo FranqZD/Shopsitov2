@@ -14,6 +14,7 @@ Dos ambientes idénticos y separados, cada uno con su propio estado de Terraform
 ```
 infra/
 ├── desplegar.sh                 # build + terraform + migraciones + Pages, en un paso
+├── tf.sh                        # terraform con las credenciales del estado remoto (R2)
 └── terraform/
     ├── modules/shopsito/        # todos los recursos de un ambiente
     └── envs/
@@ -62,7 +63,60 @@ cp infra/.env.example infra/.env   # y llena CLOUDFLARE_API_TOKEN y CLOUDFLARE_A
 (copia el `.example`). Si vas a correr `terraform apply` directo (sin el script), pon también
 `cloudflare_api_token` en ese `terraform.tfvars`.
 
+## Estado de Terraform (en R2)
+
+El estado de cada ambiente vive en el bucket R2 privado `shopsito-tfstate`
+(`dev/terraform.tfstate` y `prod/terraform.tfstate`), así tu máquina y GitHub Actions ven lo mismo.
+Terraform habla con R2 por su API compatible con S3; `infra/tf.sh` arma el endpoint y deriva las
+credenciales del mismo `CLOUDFLARE_API_TOKEN` (Access Key ID = id del token, Secret = SHA-256 del
+token), así que no hay llaves extra. **Usa `infra/tf.sh <amb> …` en vez de `terraform` directo.**
+
+```bash
+infra/tf.sh dev plan
+infra/tf.sh prod output url_web
+```
+
+### Configuración inicial (una sola vez)
+
+1. Crear el bucket si todavía no existe (con `docker compose up` corriendo). Si ya está, no hace nada:
+   ```bash
+   source infra/.env && docker compose exec -T -e "CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN" \
+     -e "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID" dev sh -c '
+       cd apps/api
+       if npx wrangler r2 bucket list | grep -q "shopsito-tfstate"; then
+         echo "El bucket shopsito-tfstate ya existe"
+       else
+         npx wrangler r2 bucket create shopsito-tfstate
+       fi'
+   ```
+2. Subir el estado local que ya existía (respáldalo antes). Terraform pregunta si copiarlo: `yes`.
+   ```bash
+   infra/tf.sh dev init -migrate-state
+   infra/tf.sh prod init -migrate-state
+   ```
+3. Comprobar que no ve cambios raros: `infra/tf.sh dev plan` debe decir `No changes` (o solo el
+   Worker si cambió el código). Si quiere **crear** D1/R2/Pages, el estado no se subió: no apliques.
+
 ## Desplegar
+
+### Automático (GitHub Actions)
+
+`.github/workflows/desplegar.yml`:
+
+- En cada **PR**: lint, typecheck, test y build.
+- En cada **push a `main`**: los mismos checks → despliega a **dev** → espera aprobación →
+  despliega a **prod**. Cada despliegue es `AUTO_APPROVE=1 infra/desplegar.sh <amb>`.
+
+Configuración en GitHub (una vez, la hace alguien con permisos de admin del repo):
+
+1. **Settings → Secrets and variables → Actions**: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
+2. **Settings → Environments**: crear `dev` y `prod`; a `prod` ponerle **Required reviewers**.
+3. Recomendado: proteger `main` (solo entra por PR), porque quien cambie el workflow en `main`
+   puede usar el token de Cloudflare.
+
+Ojo: las migraciones de D1 se aplican solas, primero en dev y, al aprobar, en prod.
+
+### A mano
 
 Con `docker compose up` corriendo (los pasos de Node van dentro del contenedor):
 
@@ -89,6 +143,7 @@ terraform apply -var account_id=$CLOUDFLARE_ACCOUNT_ID
 ```
 
 Terraform necesita que exista `apps/api/dist/index.js`: corre el build antes de `plan`/`apply`.
+(En el paso a paso, `terraform …` es `infra/tf.sh dev …`.)
 Cuando cambia el código de la API, el hash del bundle cambia y `apply` sube la nueva versión.
 
 ## Primer admin
@@ -106,9 +161,9 @@ docker compose exec -T -e "CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN" \
 
 ## Notas
 
-- El estado (`terraform.tfstate`) es **local** a cada carpeta de `envs/` y está en `.gitignore`.
-  Incluye el `JWT_SECRET`, así que no se comparte. Si más de una persona va a desplegar, conviene
-  moverlo a un backend remoto (por ejemplo, un bucket R2 con el backend `s3`).
+- El estado incluye el `JWT_SECRET`: el bucket `shopsito-tfstate` debe quedarse privado.
+- No hay bloqueo del estado: evita correr `apply` a mano mientras GitHub Actions despliega
+  (el workflow ya no deja que dos despliegues de CI corran a la vez).
 - `terraform destroy` en prod borra la base y las fotos. Para borrar un bucket R2 tiene que
   estar vacío.
 - Si el nombre `shopsito-web-<amb>` ya está tomado en `pages.dev`, Cloudflare le agrega un sufijo;

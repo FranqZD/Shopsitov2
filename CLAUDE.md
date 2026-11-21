@@ -2,7 +2,7 @@
 
 Marketplace del día para la comunidad de una universidad. Cualquiera publica lo que trae **hoy** (comida, snacks, artículos) con precio, cantidad y hora límite; otros lo piden y lo recogen en puntos de entrega del campus. El vendedor acepta y entrega; el comprador sigue el estado y califica. Registro directo, sin códigos de verificación; con correo institucional se gana la insignia "Comunidad". Un admin gestiona puntos de entrega y revisa reportes.
 
-Proyecto escolar de 3 personas. Prioridad: simple y que funcione de punta a punta en local. **No** crear recursos en la nube ni CI salvo que se pida (no corras `terraform apply` ni `infra/desplegar.sh` por tu cuenta).
+Proyecto escolar de 3 personas. Prioridad: simple y que funcione de punta a punta en local. **No** crear recursos en la nube salvo que se pida (no corras `terraform apply`, `infra/tf.sh` ni `infra/desplegar.sh` por tu cuenta). Hay CI en `.github/workflows/desplegar.yml`: checks en cada PR y, en cada push a `main`, despliegue a dev y luego a prod con aprobación manual.
 
 Guías por área (se cargan al trabajar en esa carpeta):
 
@@ -20,7 +20,7 @@ Monorepo con pnpm workspaces (pnpm 10.34, fijado en `packageManager`).
 | `apps/web`        | React 19 + Vite 8 + TypeScript + React Router 8 + Tailwind v4 + lucide-react   |
 | `apps/api`        | Cloudflare Worker con Hono, `wrangler.toml`, D1 (SQLite) con Drizzle, R2 fotos |
 | `packages/shared` | Enums, esquemas Zod, tipos y helpers de fecha compartidos (se consume como TS) |
-| `infra/`          | Terraform (módulo + ambientes `dev`/`prod`) y `desplegar.sh` para Cloudflare   |
+| `infra/`          | Terraform (estado en R2), `desplegar.sh` y `tf.sh`; CI en `.github/workflows`  |
 
 TypeScript se queda en **~6.0**: typescript-eslint aún no soporta TS 7.
 

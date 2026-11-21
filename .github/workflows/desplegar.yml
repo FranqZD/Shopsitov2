@@ -1,0 +1,79 @@
+# CI en cada PR y despliegue en cada push a main: checks → dev → (aprobación) → prod.
+# Secrets necesarios: CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID.
+# El environment `prod` debe tener "Required reviewers" en GitHub para que pida aprobación.
+name: CI y despliegue
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Un despliegue a la vez: dos `terraform apply` simultáneos se pisarían el estado en R2.
+concurrency:
+  group: ${{ github.event_name == 'push' && 'despliegue' || format('ci-{0}', github.ref) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  deploy-dev:
+    needs: checks
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: https://shopsito-web-dev.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          # Sin el wrapper, `terraform output -raw` devuelve solo el valor (lo usa desplegar.sh).
+          terraform_wrapper: false
+      - run: infra/desplegar.sh dev
+        env:
+          AUTO_APPROVE: 1
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy-prod:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    # Aquí se detiene hasta que alguien apruebe en GitHub (Required reviewers del environment).
+    environment:
+      name: prod
+      url: https://shopsito-web-prod.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - run: infra/desplegar.sh prod
+        env:
+          AUTO_APPROVE: 1
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

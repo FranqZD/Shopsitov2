@@ -6,8 +6,9 @@
 #   4. subida del frontend a Pages
 #
 # Uso:  infra/desplegar.sh dev|prod   (credenciales en infra/.env, ver infra/.env.example)
+#        AUTO_APPROVE=1 infra/desplegar.sh dev   # sin confirmar el plan (lo usa GitHub Actions)
 #
-# Terraform corre en tu máquina. Los pasos de Node (pnpm, wrangler) corren dentro del
+# Terraform corre en tu máquina (o en el runner de CI) vía infra/tf.sh, con el estado en R2. Los pasos de Node (pnpm, wrangler) corren dentro del
 # contenedor `dev` si `docker compose up` está activo; si no, en tu máquina.
 set -euo pipefail
 
@@ -28,9 +29,8 @@ if [[ -f "$RAIZ/infra/.env" ]]; then
 fi
 : "${CLOUDFLARE_API_TOKEN:?Falta CLOUDFLARE_API_TOKEN en infra/.env (copia infra/.env.example)}"
 : "${CLOUDFLARE_ACCOUNT_ID:?Falta CLOUDFLARE_ACCOUNT_ID en infra/.env (copia infra/.env.example)}"
-export TF_VAR_account_id="$CLOUDFLARE_ACCOUNT_ID"
-TF_DIR="$RAIZ/infra/terraform/envs/$AMBIENTE"
 cd "$RAIZ"
+tf() { "$RAIZ/infra/tf.sh" "$AMBIENTE" "$@"; }
 
 # Ejecuta un comando de Node desde la raíz del repo (en Docker si está levantado).
 node_cmd() {
@@ -48,13 +48,13 @@ echo "▸ [1/4] Build de web y api"
 node_cmd "pnpm build"
 
 echo "▸ [2/4] Terraform ($AMBIENTE)"
-terraform -chdir="$TF_DIR" init -input=false
-terraform -chdir="$TF_DIR" apply -input=false ${AUTO_APPROVE:+-auto-approve}
+tf init -input=false
+tf apply -input=false ${AUTO_APPROVE:+-auto-approve}
 
-D1_NOMBRE="$(terraform -chdir="$TF_DIR" output -raw d1_nombre)"
-D1_ID="$(terraform -chdir="$TF_DIR" output -raw d1_id)"
-PAGES="$(terraform -chdir="$TF_DIR" output -raw pages_proyecto)"
-URL_WEB="$(terraform -chdir="$TF_DIR" output -raw url_web)"
+D1_NOMBRE="$(tf output -raw d1_nombre)"
+D1_ID="$(tf output -raw d1_id)"
+PAGES="$(tf output -raw pages_proyecto)"
+URL_WEB="$(tf output -raw url_web)"
 
 echo "▸ [3/4] Migraciones de D1 ($D1_NOMBRE)"
 # wrangler.toml apunta a la D1 local; para la remota se genera una config aparte
