@@ -27,8 +27,9 @@ export function DetallePage() {
 
   if (estado.tipo !== 'listo') return <EstadoCarga estado={estado} recargar={recargar} />
   const p = estado.producto
-  // Si ya cerró (otro día o pasó su hora límite) no se puede pedir; agotado sí se muestra.
-  if (!abiertoHoy(p, ahora))
+  // Si ya cerró (otro día o pasó su hora límite) o un admin lo ocultó no se puede pedir;
+  // agotado sí se muestra.
+  if (!abiertoHoy(p, ahora) || p.estado === 'oculto')
     return <EstadoCarga estado={{ tipo: 'no-encontrado' }} recargar={recargar} />
 
   const agotado = p.cantidad === 0 || p.estado === 'agotado'

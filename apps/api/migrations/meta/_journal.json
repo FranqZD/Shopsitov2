@@ -15,6 +15,13 @@
       "when": 1795214403810,
       "tag": "0001_categoria_producto",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795216146869,
+      "tag": "0002_reportes_y_producto_oculto",
+      "breakpoints": true
     }
   ]
 }

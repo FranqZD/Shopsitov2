@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 import { LayoutAdmin } from './components/LayoutAdmin'
 import { LayoutAcceso, LayoutConNav, LayoutMovil } from './components/Layouts'
 import { RequiereSesion, SoloSinSesion } from './components/RequiereSesion'
+import { AdminProductosPage } from './pages/AdminProductosPage'
 import { AdminPuntosPage } from './pages/AdminPuntosPage'
 import { AdminReportesPage } from './pages/AdminReportesPage'
 import { CalificarPage } from './pages/CalificarPage'
@@ -50,7 +51,8 @@ export const router = createBrowserRouter([
         path: '/admin',
         element: <LayoutAdmin />,
         children: [
-          { index: true, element: <AdminPuntosPage /> },
+          { index: true, element: <AdminProductosPage /> },
+          { path: 'puntos', element: <AdminPuntosPage /> },
           { path: 'reportes', element: <AdminReportesPage /> },
         ],
       },

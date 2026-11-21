@@ -1,4 +1,10 @@
 import type {
+  ActualizarReporteInput,
+  AdminProducto,
+  CambiarEstadoProductoInput,
+  CrearReporteInput,
+  EstadoReporte,
+  Reporte,
   ActualizarProductoInput,
   ActualizarPuntoEntregaInput,
   ApiError,
@@ -8,11 +14,14 @@ import type {
   LoginInput,
   MiPublicacion,
   Pedido,
+  PerfilUsuario,
   Producto,
   RegistroInput,
   LoginResponse,
   ProductoHoy,
   PuntoEntrega,
+  Resena,
+  UsuarioPrivado,
 } from '@shopsito/shared'
 import { getToken, guardarSesion, rutaLogin } from './sesion'
 
@@ -69,6 +78,13 @@ export const api = {
     registro: (datos: RegistroInput) =>
       request<LoginResponse>('/auth/registro', { method: 'POST', body: json(datos) }),
   },
+  usuarios: {
+    yo: () => request<UsuarioPrivado>('/usuarios/me'),
+    perfil: (id: string) => request<PerfilUsuario>(`/usuarios/${id}`),
+  },
+  calificaciones: {
+    deVendedor: (id: string) => request<Resena[]>(`/calificaciones/vendedor/${id}`),
+  },
   productos: {
     hoy: () => request<ProductoHoy[]>('/productos/hoy'),
     obtener: (id: string) => request<ProductoHoy>(`/productos/${id}`),
@@ -87,6 +103,21 @@ export const api = {
   pedidos: {
     crear: (datos: CrearPedidoInput) =>
       request<Pedido>('/pedidos', { method: 'POST', body: json(datos) }),
+  },
+  reportes: {
+    crear: (datos: CrearReporteInput) =>
+      request<void>('/reportes', { method: 'POST', body: json(datos) }),
+    listar: (estado?: EstadoReporte) =>
+      request<Reporte[]>(`/reportes${estado ? `?estado=${estado}` : ''}`),
+    actualizar: (id: string, datos: ActualizarReporteInput) =>
+      request<void>(`/reportes/${id}`, { method: 'PATCH', body: json(datos) }),
+  },
+  admin: {
+    productos: (fecha?: string) =>
+      request<AdminProducto[]>(`/admin/productos${fecha ? `?fecha=${fecha}` : ''}`),
+    cambiarEstado: (id: string, datos: CambiarEstadoProductoInput) =>
+      request<Producto>(`/admin/productos/${id}`, { method: 'PATCH', body: json(datos) }),
+    eliminar: (id: string) => request<void>(`/admin/productos/${id}`, { method: 'DELETE' }),
   },
   puntosEntrega: {
     listar: () => request<PuntoEntrega[]>('/puntos-entrega'),

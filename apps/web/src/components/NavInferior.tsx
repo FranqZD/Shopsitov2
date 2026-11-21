@@ -3,7 +3,7 @@ import { useItemsNav } from '../lib/navegacion'
 
 /** Celular: pastilla flotante abajo con Hoy · Vender · Pedidos · Perfil. */
 export function NavInferior() {
-  const items = useItemsNav()
+  const items = useItemsNav().filter((i) => !i.soloArriba)
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[430px] px-4 pt-3 pb-[max(22px,env(safe-area-inset-bottom))] md:hidden">
       <nav

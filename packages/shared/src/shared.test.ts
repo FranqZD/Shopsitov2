@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { ahoraCampus, crearProductoSchema, esCorreoInstitucional, segundosHastaHora } from './index'
+import {
+  ahoraCampus,
+  crearProductoSchema,
+  esCorreoInstitucional,
+  resumirCalificaciones,
+  segundosHastaHora,
+} from './index'
 
 describe('ahoraCampus', () => {
   it('convierte a la hora de Ciudad de México (UTC-6)', () => {
@@ -66,5 +72,23 @@ describe('esCorreoInstitucional', () => {
     expect(esCorreoInstitucional('ana@gmail.com')).toBe(false)
     expect(esCorreoInstitucional('ana@miuniversidad.edu.mx')).toBe(false)
     expect(esCorreoInstitucional('ana@universidad.edu.mx.falso.com')).toBe(false)
+  })
+})
+
+describe('resumirCalificaciones', () => {
+  it('cuenta por estrellas y redondea el promedio a un decimal', () => {
+    expect(resumirCalificaciones([5, 5, 4, 3, 5])).toEqual({
+      promedio: 4.4,
+      total: 5,
+      porEstrellas: [3, 1, 1, 0, 0],
+    })
+  })
+
+  it('sin calificaciones no hay promedio', () => {
+    expect(resumirCalificaciones([])).toEqual({
+      promedio: null,
+      total: 0,
+      porEstrellas: [0, 0, 0, 0, 0],
+    })
   })
 })

@@ -1,3 +1,5 @@
+import { ahoraCampus } from '@shopsito/shared'
+
 const miles = new Intl.NumberFormat('es-MX')
 
 /** El dinero viaja en centavos; solo se convierte al mostrarlo. "$35", "$1,250", "$35.50". */
@@ -58,6 +60,54 @@ export function tituloHoy(fecha: string) {
 export function saludo(hora: string) {
   const h = Number(hora.slice(0, 2))
   return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
+}
+
+/** Nombre para reseñas: "Luis Ángel Torres" → "Luis Ángel T.", "Ana" → "Ana". */
+export function nombreConInicial(nombre: string) {
+  const partes = nombre.trim().split(/\s+/)
+  if (partes.length < 2) return partes[0] ?? nombre
+  return `${partes.slice(0, -1).join(' ')} ${partes.at(-1)![0]}.`
+}
+
+const MESES_LARGOS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+]
+
+/** Días de calendario (hora del campus) entre dos fechas YYYY-MM-DD. */
+function diasEntre(desde: string, hasta: string) {
+  return Math.round((Date.parse(hasta) - Date.parse(desde)) / 86_400_000)
+}
+
+/** "Hoy", "Ayer", "Hace 3 días", "La semana pasada", "Hace 3 semanas" o "12 de oct". */
+export function haceCuanto(iso: string, ahora: Date = new Date()) {
+  const fecha = ahoraCampus(new Date(iso)).fecha
+  const dias = diasEntre(fecha, ahoraCampus(ahora).fecha)
+  if (dias <= 0) return 'Hoy'
+  if (dias === 1) return 'Ayer'
+  if (dias < 7) return `Hace ${dias} días`
+  if (dias < 14) return 'La semana pasada'
+  if (dias < 31) return `Hace ${Math.floor(dias / 7)} semanas`
+  const [, m, d] = fecha.split('-').map(Number)
+  return `${d} de ${MESES[m! - 1]}`
+}
+
+/** "En Shopsito desde agosto" (con año si no es el actual). */
+export function desdeCuando(iso: string, ahora: Date = new Date()) {
+  const [a, m] = ahoraCampus(new Date(iso)).fecha.split('-').map(Number)
+  const anioActual = Number(ahoraCampus(ahora).fecha.slice(0, 4))
+  const mes = MESES_LARGOS[m! - 1]
+  return `En Shopsito desde ${mes}${a === anioActual ? '' : ` de ${a}`}`
 }
 
 /** "1 cosa", "8 cosas". */

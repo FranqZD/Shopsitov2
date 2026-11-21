@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import type { AppEnv } from './env'
 import { onError, onNotFound } from './lib/errors'
+import { adminRoutes } from './modules/admin/routes'
 import { authRoutes } from './modules/auth/routes'
 import { fotosRoutes } from './modules/fotos/routes'
 import { calificacionesRoutes } from './modules/calificaciones/routes'
@@ -28,6 +29,7 @@ const app = new Hono<AppEnv>()
   .route('/notificaciones', notificacionesRoutes)
   .route('/reportes', reportesRoutes)
   .route('/puntos-entrega', puntosEntregaRoutes)
+  .route('/admin', adminRoutes)
 
 app.onError(onError)
 app.notFound(onNotFound)
