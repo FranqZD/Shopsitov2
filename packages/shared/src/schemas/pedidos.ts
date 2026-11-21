@@ -17,3 +17,24 @@ export type Pedido = {
   total: number
   creadoEn: string
 }
+
+export type PedidoVentaItem = {
+  productoId: string
+  nombre: string
+  fotoKey: string | null
+  cantidad: number
+  precioUnitario: number
+}
+
+/** Un pedido visto por quien vende (`GET /pedidos/ventas`). */
+export type PedidoVenta = {
+  id: string
+  estado: EstadoPedido
+  total: number
+  creadoEn: string
+  /** La hora límite más temprana de sus productos: si sigue pendiente a esa hora, se cancela solo. */
+  horaLimite: string
+  comprador: { id: string; nombre: string; insigniaComunidad: boolean }
+  puntoEntrega: { id: string; nombre: string }
+  items: PedidoVentaItem[]
+}

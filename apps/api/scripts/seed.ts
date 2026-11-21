@@ -351,6 +351,32 @@ const HISTORIAL: Venta[] = [
   },
 ]
 
+// Pedidos de HOY (para "Mis ventas" de Mariana). `producto` es el índice en PRODUCTOS;
+// la cantidad de PRODUCTOS ya es lo que queda después de estos pedidos.
+type PedidoHoy = {
+  comprador: Clave
+  producto: number
+  cantidad: number
+  punto: number
+  estado: 'pendiente' | 'aceptado' | 'entregado'
+  minutosAtras: number
+}
+
+const PEDIDOS_HOY: PedidoHoy[] = [
+  { comprador: 'ana', producto: 2, cantidad: 2, punto: 0, estado: 'pendiente', minutosAtras: 1 },
+  { comprador: 'luis', producto: 2, cantidad: 1, punto: 1, estado: 'aceptado', minutosAtras: 12 },
+  { comprador: 'sofia', producto: 2, cantidad: 2, punto: 0, estado: 'entregado', minutosAtras: 35 },
+  { comprador: 'jorge', producto: 6, cantidad: 3, punto: 0, estado: 'entregado', minutosAtras: 60 },
+  {
+    comprador: 'andrea',
+    producto: 6,
+    cantidad: 3,
+    punto: 1,
+    estado: 'entregado',
+    minutosAtras: 85,
+  },
+]
+
 // Reportes de ejemplo. `objetivo` es una clave de usuario o el índice de un producto de PRODUCTOS.
 type ReporteSeed = {
   reportante: Clave
@@ -503,6 +529,28 @@ const sql = [
             }),
           ]
         : []),
+    ]
+  }),
+  ...PEDIDOS_HOY.flatMap((p, i) => {
+    const producto = PRODUCTOS[p.producto]!
+    const pedidoId = id(801 + i)
+    return [
+      insert('pedidos', {
+        id: pedidoId,
+        comprador_id: uid[p.comprador],
+        vendedor_id: uid[producto.vendedor],
+        punto_entrega_id: id(101 + p.punto),
+        estado: p.estado,
+        total: producto.precio * p.cantidad,
+        creado_en: new Date(ahora.getTime() - p.minutosAtras * 60 * 1000).toISOString(),
+      }),
+      insert('detalle_pedido', {
+        id: id(851 + i),
+        pedido_id: pedidoId,
+        producto_id: id(201 + p.producto),
+        cantidad: p.cantidad,
+        precio_unitario: producto.precio,
+      }),
     ]
   }),
   ...REPORTES.map((r, i) =>
