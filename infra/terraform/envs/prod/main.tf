@@ -12,9 +12,23 @@ terraform {
     }
   }
 
-  # Estado local (terraform.tfstate en esta carpeta, ignorado por git). Contiene el
-  # JWT_SECRET: no lo compartas por chat. Para trabajar en equipo se puede mover a un
-  # backend remoto (p. ej. un bucket R2 con backend "s3").
+  # Estado remoto en el bucket R2 `shopsito-tfstate` (compatible con S3), compartido entre
+  # tu máquina y GitHub Actions. Contiene el JWT_SECRET: el bucket es privado.
+  # infra/tf.sh pone el endpoint (AWS_ENDPOINT_URL_S3) y las credenciales; no corras
+  # `terraform` directo en esta carpeta.
+  backend "s3" {
+    bucket = "shopsito-tfstate"
+    key    = "prod/terraform.tfstate"
+    region = "auto"
+
+    # R2 habla S3 pero no es AWS: se apagan las validaciones propias de AWS.
+    skip_credentials_validation = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    skip_metadata_api_check     = true
+    skip_s3_checksum            = true
+    use_path_style              = true
+  }
 }
 
 # Token desde terraform.tfvars; si no está ahí, de la variable de entorno CLOUDFLARE_API_TOKEN.
