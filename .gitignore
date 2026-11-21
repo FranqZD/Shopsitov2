@@ -9,3 +9,11 @@ dist/
 
 # Paquete de diseño original (solo local; el diseño vive en apps/web)
 referencias/
+
+# Terraform (el .terraform.lock.hcl sí se sube)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log

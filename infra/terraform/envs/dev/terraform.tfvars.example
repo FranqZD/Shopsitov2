@@ -1,0 +1,6 @@
+# Copia a terraform.tfvars (ignorado por git; nunca lo subas).
+account_id = "tu-account-id-de-cloudflare"
+
+# Opcional: si no lo pones, se usa la variable de entorno CLOUDFLARE_API_TOKEN.
+# Permisos de cuenta: D1 Edit, Workers R2 Storage Edit, Workers Scripts Edit, Cloudflare Pages Edit.
+cloudflare_api_token = "tu-token"
