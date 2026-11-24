@@ -12,7 +12,7 @@ export const TRANSICIONES_VENDEDOR: Record<
   entregar: { desde: 'aceptado', hacia: 'entregado' },
 }
 
-/** El comprador solo puede cancelar pedidos que aún no se han aceptado. */
+/** Mensaje si el pedido ya no admite la acción (p. ej. entregar algo que no se aceptó). */
 export function problemaTransicion(estado: EstadoPedido, accion: AccionVendedor): string | null {
   if (estado === TRANSICIONES_VENDEDOR[accion].desde) return null
   if (estado === 'cancelado') return 'Este pedido ya se canceló.'
@@ -22,7 +22,7 @@ export function problemaTransicion(estado: EstadoPedido, accion: AccionVendedor)
   return 'Ya aceptaste este pedido.'
 }
 
-/** Mensaje si el pedido ya no admite la acción (p. ej. entregar algo que no se aceptó). */
+/** El comprador solo puede cancelar mientras el vendedor no lo haya aceptado. */
 export function problemaCancelar(estado: EstadoPedido): string | null {
   if (estado === 'pendiente') return null
   if (estado === 'aceptado') return 'Ya lo aceptaron. Si no puedes ir, avísale a quien vende.'
@@ -66,6 +66,14 @@ export function avisoComprador(
   }
 }
 
+/** Aviso para el vendedor cuando le hacen un pedido. */
+export const avisoVendedorNuevo = (datos: { comprador: string; resumen: string }) =>
+  `Nuevo pedido de ${primerNombre(datos.comprador)}: ${datos.resumen}.`
+
+/** Aviso para el vendedor cuando el comprador cancela. */
+export const avisoVendedorCancelado = (datos: { comprador: string; resumen: string }) =>
+  `${primerNombre(datos.comprador)} canceló su pedido de ${datos.resumen}.`
+
 export type ItemPedido = { productoId: string; cantidad: number }
 
 /** Si el mismo producto viene dos veces, suma las cantidades. */
@@ -91,7 +99,7 @@ export type ProductoParaPedido = {
 export type ProblemaPedido = { status: 400 | 403 | 409; code: string; mensaje: string }
 
 /**
- * revisa que se pueda pedir lo que llegó: un solo vendedor, que no sea uno mismo y que cada
+ * Revisa que se pueda pedir lo que llegó: un solo vendedor, que no sea uno mismo y que cada
  * producto siga disponible hoy, antes de su hora límite y con existencias suficientes.
  * Devuelve el primer problema (con mensaje para el usuario) o null si todo está bien.
  */
@@ -137,32 +145,4 @@ export function problemaPedido(
     }
   }
   return null
-}
-
-/** Aviso para el vendedor cuando le hacen un pedido.*/
-export function avisoVendedor(
-  hacia: EstadoPedido,
-  datos: { comprador: string; resumen: string; punto: string },
-) {
-  const quien = primerNombre(datos.comprador)
-  switch (hacia) {
-    case 'pendiente':
-      return `${quien} hizo un pedido de ${datos.resumen}.`
-    default:
-      return `El pedido de ${datos.resumen} cambió de estado.`
-  }
-}
-
-/** Aviso para el vendedor cuando le cancelan un pedido.*/
-export function avisoVendedorCancelado(
-  hacia: EstadoPedido,
-  datos: { comprador: string; resumen: string; punto: string },
-) {
-  const quien = primerNombre(datos.comprador)
-  switch (hacia) {
-    case 'cancelado':
-      return `${quien} canceló su pedido de ${datos.resumen}.`
-    default:
-      return `El pedido de ${datos.resumen} cambió de estado.`
-  }
 }
