@@ -10,6 +10,7 @@ Guías por área (se cargan al trabajar en esa carpeta):
 - Frontend: [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md)
 - Para humanos: [`README.md`](README.md)
 - Despliegue en Cloudflare: [`infra/README.md`](infra/README.md)
+- Wiki con diagramas: [`docs/WIKI.md`](docs/WIKI.md)
 
 ## Stack
 
@@ -50,6 +51,25 @@ Usuarios del seed: `admin@shopsito.test` / `admin1234` (admin); `ana@`, `beto@`,
 `pnpm preparar` · `pnpm dev` · `pnpm build` · `pnpm lint` · `pnpm format` · `pnpm typecheck` · `pnpm test` · `pnpm db:generate` · `pnpm db:migrate` · `pnpm db:seed`
 
 Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck && pnpm test` (y `pnpm build` si tocaste config). Todo debe pasar.
+
+## Wiki (actualízala siempre)
+
+`docs/WIKI.md` debe describir lo que hay en el código. Si tu cambio toca algo de esta tabla, actualiza la wiki **en el mismo cambio**, sin que te lo pidan:
+
+| Si cambias…                                     | Actualiza en la wiki                              |
+| ----------------------------------------------- | ------------------------------------------------- |
+| Reglas de negocio, roles o estados de un pedido | Sección 1 (reglas, actores y diagrama de estados) |
+| Tablas o enums                                  | 2.2 (modelo de dominio)                           |
+| Rutas o funciones de la API                     | 2.3 y 2.4 (clases) y 2.8 (endpoints)              |
+| `packages/shared`                               | 2.5                                               |
+| `lib/`, páginas o componentes de la web         | 2.6 y 2.7                                         |
+| Dependencias o versiones principales            | Sección 3                                         |
+| Terraform, bindings o secretos                  | Sección 4 (inventario y diagramas)                |
+| Docker, `desplegar.sh` o el workflow de GitHub  | Sección 5                                         |
+
+- Al implementar algo que respondía `501`: quita la cursiva (el `*` al final del método) y cambia ⏳ por ✅.
+- Al conectar una pantalla a la API, cambia su columna "Datos" en 2.7.
+- Los diagramas son Mermaid: revisa que sigan dibujándose. Si nada de la tabla cambió, no toques la wiki.
 
 ## Estado actual (actualízalo cuando implementes algo)
 
