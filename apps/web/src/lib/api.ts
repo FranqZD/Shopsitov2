@@ -13,7 +13,9 @@ import type {
   CrearPuntoEntregaInput,
   LoginInput,
   MiPublicacion,
+  Notificacion,
   Pedido,
+  PedidoCompra,
   PedidoVenta,
   PerfilUsuario,
   Producto,
@@ -104,10 +106,18 @@ export const api = {
   pedidos: {
     crear: (datos: CrearPedidoInput) =>
       request<Pedido>('/pedidos', { method: 'POST', body: json(datos) }),
+    compras: () => request<PedidoCompra[]>('/pedidos/compras'),
     ventas: () => request<PedidoVenta[]>('/pedidos/ventas'),
+    cancelar: (id: string) => request<Pedido>(`/pedidos/${id}/cancelar`, { method: 'POST' }),
     aceptar: (id: string) => request<Pedido>(`/pedidos/${id}/aceptar`, { method: 'POST' }),
     rechazar: (id: string) => request<Pedido>(`/pedidos/${id}/rechazar`, { method: 'POST' }),
     entregar: (id: string) => request<Pedido>(`/pedidos/${id}/entregar`, { method: 'POST' }),
+  },
+  notificaciones: {
+    listar: () => request<Notificacion[]>('/notificaciones'),
+    marcarLeida: (id: string) =>
+      request<Notificacion>(`/notificaciones/${id}/leida`, { method: 'PATCH' }),
+    marcarTodas: () => request<void>('/notificaciones/leidas', { method: 'PATCH' }),
   },
   reportes: {
     crear: (datos: CrearReporteInput) =>

@@ -14,7 +14,7 @@ import { FotoProducto } from '../components/FotoProducto'
 import { ProntoSkeleton, TarjetaSkeleton } from '../components/Skeleton'
 import { Tarjeta } from '../components/Tarjeta'
 import { CATEGORIAS } from '../lib/categorias'
-import { NOTIFICACIONES } from '../lib/ejemplos'
+import { useAvisos } from '../lib/avisos'
 import { cosas, formatoPrecio, saludo, tituloHoy } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
 import { useAhora } from '../lib/useAhora'
@@ -25,10 +25,8 @@ const FILTROS = [{ id: 'todo', nombre: 'Todo', Icono: LayoutGrid } as const, ...
 /** Publicaciones que cierran en menos de 1 h aparecen en "Se acaba pronto". */
 const SEGUNDOS_PRONTO = 3600
 
-// TODO: contar con GET /api/notificaciones.
-const SIN_LEER = NOTIFICACIONES.flatMap((g) => g.items).filter((n) => n.nueva).length
-
 export function CatalogoPage() {
+  const { sinLeer: SIN_LEER } = useAvisos()
   const { estado, recargar } = useProductosHoy()
   const ahora = useAhora()
   const { fecha, hora } = ahoraCampus(ahora)

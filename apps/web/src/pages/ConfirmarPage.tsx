@@ -18,9 +18,11 @@ import { BotonRedondo } from '../components/BotonRedondo'
 import { FotoProducto } from '../components/FotoProducto'
 import { InsigniaMini } from '../components/Insignia'
 import { api } from '../lib/api'
+import { refrescarAvisos } from '../lib/avisos'
 import { formatoPrecio, nombreCorto } from '../lib/formato'
 import { urlFoto } from '../lib/fotos'
 import { abiertoHoy, useProducto } from '../lib/useProducto'
+import { invalidarProductosHoy } from '../lib/useProductosHoy'
 import { EstadoCarga } from './EstadoCarga'
 
 /** Icono según el nombre del punto (biblioteca, edificio, cafetería). */
@@ -73,7 +75,12 @@ export function ConfirmarPage() {
     api.pedidos
       .crear({ puntoEntregaId: puntoId, items: [{ productoId: p.id, cantidad }] })
       .then(
-        () => navigate('/pedidos'),
+        () => {
+          // Lo pedido ya no está en el catálogo con las mismas existencias.
+          invalidarProductosHoy()
+          void refrescarAvisos()
+          navigate('/pedidos')
+        },
         (e: Error) => setError(e.message),
       )
       .finally(() => setEnviando(false))
