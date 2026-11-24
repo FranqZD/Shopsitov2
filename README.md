@@ -60,7 +60,8 @@ También hay vendedores de ejemplo del diseño (`mariana@`, `diego@`, `fernanda@
 
 ### Notas del entorno Docker
 
-- La imagen es la oficial `node:24-bookworm-slim` más los certificados raíz (`.devcontainer/Dockerfile`, 3 líneas). Debian y no Alpine porque `workerd` necesita glibc.
+- La imagen es [`franqzd/shopsito-dev`](https://hub.docker.com/r/franqzd/shopsito-dev), la misma que usan los checks del pipeline: `node:24-bookworm-slim`, certificados raíz y pnpm. Debian y no Alpine porque `workerd` necesita glibc. No lleva código ni secretos.
+- Para traer la última versión: `docker compose pull`. Para cambiarla, edita `.devcontainer/Dockerfile` en un PR; el pipeline la publica y `latest` avanza al unirlo a `main`. Para probar el cambio antes: `docker build -t franqzd/shopsito-dev:latest .devcontainer`.
 - `node_modules` de la raíz vive en un volumen nombrado, así no se mezclan binarios de tu sistema con los de Linux. Si algo se rompe: `docker compose down -v` y vuelve a levantar.
 - El contenedor no trae git: haz commits desde tu máquina (o desde la terminal de VS Code fuera del contenedor).
 - El estado local de D1/R2 está en `apps/api/.wrangler/` (ignorado por git) y persiste entre reinicios. Bórralo para empezar desde cero.
@@ -113,7 +114,7 @@ El diseño que ya está en la app es la referencia: tokens, componentes base y p
 
 ```
 .
-├── .devcontainer/          # Dockerfile mínimo (Node 24 slim + certificados) y devcontainer.json
+├── .devcontainer/          # Dockerfile mínimo (Node 24 slim + certificados + pnpm) y devcontainer.json
 ├── docker-compose.yml
 ├── apps/
 │   ├── api/

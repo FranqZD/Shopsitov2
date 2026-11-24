@@ -5,7 +5,7 @@
   "workspaceFolder": "/workspace",
   // No arranca `pnpm dev` solo: córrelo en la terminal cuando quieras.
   "overrideCommand": true,
-  "postCreateCommand": "corepack enable && pnpm preparar",
+  "postCreateCommand": "pnpm preparar",
   "customizations": {
     "vscode": {
       "extensions": [

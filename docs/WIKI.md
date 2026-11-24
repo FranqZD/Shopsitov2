@@ -667,23 +667,24 @@ Estado: ✅ implementado · ⏳ responde `501`. Acceso: **público**, **sesión*
 
 ## 3. Stack tecnológico
 
-| Capa             | Tecnología                                                | Para qué                                        |
-| ---------------- | --------------------------------------------------------- | ----------------------------------------------- |
-| Lenguaje         | TypeScript ~6.0                                           | Todo el proyecto                                |
-| Monorepo         | pnpm 10.34 workspaces, Node.js 24                         | `apps/web`, `apps/api`, `packages/shared`       |
-| Frontend         | React 19, React Router 8, Vite 8                          | SPA responsive                                  |
-| Estilos          | Tailwind CSS 4, lucide-react                              | Tokens del tema, modo oscuro e iconos           |
-| Backend          | Hono 4 sobre Cloudflare Workers                           | API REST                                        |
-| Validación       | Zod 4, `@hono/zod-validator`                              | Contrato compartido entre web y API             |
-| Base de datos    | Cloudflare D1 (SQLite), Drizzle ORM 0.45, drizzle-kit     | Datos y migraciones                             |
-| Archivos         | Cloudflare R2                                             | Fotos de productos                              |
-| Autenticación    | JWT HS256 (7 días), PBKDF2-SHA256 con WebCrypto           | Sesión sin estado y contraseñas                 |
-| Hosting web      | Cloudflare Pages y Pages Functions                        | Archivos estáticos y proxy de `/api`            |
-| Infraestructura  | Terraform ≥ 1.6 (providers Cloudflare 5.29 y Random 3)    | Recursos de dev y prod                          |
-| CI/CD            | GitHub Actions, Wrangler 4                                | Checks, despliegue y migraciones                |
-| Pruebas          | Vitest 5                                                  | Pruebas unitarias                               |
-| Calidad          | ESLint 10, typescript-eslint 8, Prettier 3                | Lint y formato                                  |
-| Desarrollo local | Docker Compose, Dev Containers, Wrangler (simula D1 y R2) | Ambiente igual para el equipo, sin usar la nube |
+| Capa                 | Tecnología                                                | Para qué                                        |
+| -------------------- | --------------------------------------------------------- | ----------------------------------------------- |
+| Lenguaje             | TypeScript ~6.0                                           | Todo el proyecto                                |
+| Monorepo             | pnpm 10.34 workspaces, Node.js 24                         | `apps/web`, `apps/api`, `packages/shared`       |
+| Frontend             | React 19, React Router 8, Vite 8                          | SPA responsive                                  |
+| Estilos              | Tailwind CSS 4, lucide-react                              | Tokens del tema, modo oscuro e iconos           |
+| Backend              | Hono 4 sobre Cloudflare Workers                           | API REST                                        |
+| Validación           | Zod 4, `@hono/zod-validator`                              | Contrato compartido entre web y API             |
+| Base de datos        | Cloudflare D1 (SQLite), Drizzle ORM 0.45, drizzle-kit     | Datos y migraciones                             |
+| Archivos             | Cloudflare R2                                             | Fotos de productos                              |
+| Autenticación        | JWT HS256 (7 días), PBKDF2-SHA256 con WebCrypto           | Sesión sin estado y contraseñas                 |
+| Hosting web          | Cloudflare Pages y Pages Functions                        | Archivos estáticos y proxy de `/api`            |
+| Infraestructura      | Terraform ≥ 1.6 (providers Cloudflare 5.29 y Random 3)    | Recursos de dev y prod                          |
+| CI/CD                | GitHub Actions, Wrangler 4                                | Checks, despliegue y migraciones                |
+| Pruebas              | Vitest 5                                                  | Pruebas unitarias                               |
+| Calidad              | ESLint 10, typescript-eslint 8, Prettier 3                | Lint y formato                                  |
+| Desarrollo local     | Docker Compose, Dev Containers, Wrangler (simula D1 y R2) | Ambiente igual para el equipo, sin usar la nube |
+| Registro de imágenes | Docker Hub (`franqzd/shopsito-dev`)                       | Imagen compartida por el equipo y los checks    |
 
 ---
 
@@ -704,11 +705,13 @@ Todo vive en una cuenta de Cloudflare y lo crea Terraform (`infra/terraform/modu
 
 Fuera del módulo:
 
-| Recurso                                                  | Cómo se crea          | Para qué                               |
-| -------------------------------------------------------- | --------------------- | -------------------------------------- |
-| Bucket R2 privado `shopsito-tfstate`                     | Una vez, con Wrangler | Estado de Terraform de ambos ambientes |
-| Environments `dev` y `prod` en GitHub                    | A mano, en Settings   | Aprobación manual antes de prod        |
-| Secrets `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` | A mano, en Settings   | Credenciales del despliegue            |
+| Recurso                                                  | Cómo se crea          | Para qué                                                  |
+| -------------------------------------------------------- | --------------------- | --------------------------------------------------------- |
+| Bucket R2 privado `shopsito-tfstate`                     | Una vez, con Wrangler | Estado de Terraform de ambos ambientes                    |
+| Environments `dev` y `prod` en GitHub                    | A mano, en Settings   | Aprobación manual antes de prod                           |
+| Secrets `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` | A mano, en Settings   | Credenciales del despliegue                               |
+| Repo público `franqzd/shopsito-dev` en Docker Hub        | A mano, en Docker Hub | Imagen de trabajo del equipo y de los checks              |
+| Variable `DOCKERHUB_USERNAME` y secret `DOCKERHUB_TOKEN` | A mano, en Settings   | Conexión del pipeline con Docker Hub (service connection) |
 
 D1 y R2 se crean con ubicación sugerida `wnam` (oeste de Norteamérica).
 
@@ -806,9 +809,10 @@ En la computadora de cada quien, sin usar la nube:
 
 ```mermaid
 flowchart LR
+    hub[("Docker Hub:<br/>shopsito-dev")]
     subgraph host["«device» Computadora de desarrollo"]
         navl["Navegador"]
-        subgraph docker["«container» docker compose: dev (node:24-bookworm-slim)"]
+        subgraph docker["«container» docker compose: dev (franqzd/shopsito-dev)"]
             vite["Vite :5173"]
             wrangler["Wrangler :8787"]
             sim[("D1 y R2 simulados en apps/api/.wrangler")]
@@ -819,22 +823,29 @@ flowchart LR
     navl -->|"localhost:5173"| vite
     vite -->|"proxy /api"| wrangler
     wrangler --> sim
+    hub -->|"docker compose pull"| docker
 ```
 
 ### 5.2 Flujo de despliegue (CI/CD)
 
 `.github/workflows/desplegar.yml` corre los checks en cada PR. En cada push a `main` corre los checks, despliega a dev y, con aprobación, a prod.
 
+Los checks corren dentro de la imagen `franqzd/shopsito-dev` de Docker Hub, la misma que usa `docker compose`. El job `imagen` la construye (amd64 y arm64) solo si cambió `.devcontainer/Dockerfile`: la etiqueta es el hash de ese archivo. `latest` avanza solo desde `main`. Cloudflare no usa esta imagen.
+
 ```mermaid
 flowchart LR
-    pr["Pull request"] --> checks
-    push["Push a main"] --> checks
+    pr["Pull request"] --> imagen
+    push["Push a main"] --> imagen
+    imagen -->|"publica si cambió"| hub[("Docker Hub:<br/>shopsito-dev")]
+    hub -->|"contenedor"| checks
 
     subgraph gha["GitHub Actions"]
+        imagen["imagen"]
         checks["checks: lint, typecheck, test, build"]
         dev["deploy-dev"]
         aprob{"¿Aprobado por un revisor?"}
         prod["deploy-prod"]
+        imagen --> checks
         checks -->|"solo en push"| dev
         dev --> aprob
         aprob -->|"sí"| prod
