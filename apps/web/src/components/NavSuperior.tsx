@@ -1,6 +1,7 @@
 import { Bell } from 'lucide-react'
 import { Link } from 'react-router'
-import { NOTIFICACIONES_SIN_LEER, useItemsNav } from '../lib/navegacion'
+import { useAvisos } from '../lib/avisos'
+import { useItemsNav } from '../lib/navegacion'
 import { getSesion } from '../lib/sesion'
 import { LogoShopsito } from './LogoShopsito'
 import { MenuCuenta } from './MenuCuenta'
@@ -8,6 +9,7 @@ import { MenuCuenta } from './MenuCuenta'
 /** Tablet y computadora: la misma navegación como pastilla flotante arriba. */
 export function NavSuperior() {
   const items = useItemsNav()
+  const { sinLeer } = useAvisos()
   const sesion = getSesion()
   return (
     <div className="sticky top-0 z-30 hidden bg-papel/95 px-6 pt-4 pb-2 md:block">
@@ -43,15 +45,11 @@ export function NavSuperior() {
         </div>
         <Link
           to="/notificaciones"
-          aria-label={
-            NOTIFICACIONES_SIN_LEER
-              ? `Notificaciones, ${NOTIFICACIONES_SIN_LEER} sin leer`
-              : 'Notificaciones'
-          }
+          aria-label={sinLeer ? `Notificaciones, ${sinLeer} sin leer` : 'Notificaciones'}
           className="relative flex size-11 flex-none items-center justify-center rounded-full bg-azul-50 text-azul"
         >
           <Bell size={20} strokeWidth={1.9} aria-hidden="true" />
-          {NOTIFICACIONES_SIN_LEER > 0 && (
+          {sinLeer > 0 && (
             <span className="absolute top-2 right-2.5 size-2.5 rounded-full border-2 border-azul-50 bg-mango" />
           )}
         </Link>

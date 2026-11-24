@@ -1,13 +1,7 @@
 import { CirclePlus, Shield, ShoppingBag, Sun, User, type LucideIcon } from 'lucide-react'
 import { useLocation } from 'react-router'
-import { ACTIVOS, NOTIFICACIONES, PEDIDOS } from './ejemplos'
+import { useAvisos } from './avisos'
 import { getSesion } from './sesion'
-
-// TODO: contar con GET /api/pedidos/compras y GET /api/notificaciones cuando existan.
-export const PEDIDOS_ACTIVOS = PEDIDOS.filter((p) => ACTIVOS.includes(p.estado)).length
-export const NOTIFICACIONES_SIN_LEER = NOTIFICACIONES.flatMap((g) => g.items).filter(
-  (n) => n.nueva,
-).length
 
 export type ItemNav = {
   to: string
@@ -26,6 +20,7 @@ export type ItemNav = {
 export function useItemsNav(): ItemNav[] {
   const { pathname } = useLocation()
   const sesion = getSesion()
+  const { pedidosActivos } = useAvisos()
   const items: ItemNav[] = [
     { to: '/', label: 'Hoy', Icono: Sun, activo: pathname === '/' },
     {
@@ -39,7 +34,7 @@ export function useItemsNav(): ItemNav[] {
       label: 'Pedidos',
       Icono: ShoppingBag,
       activo: pathname.startsWith('/pedidos'),
-      badge: PEDIDOS_ACTIVOS,
+      badge: pedidosActivos,
     },
     {
       to: sesion ? `/perfil/${sesion.usuario.id}` : '/login',
