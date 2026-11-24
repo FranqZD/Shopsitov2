@@ -103,13 +103,15 @@ infra/tf.sh prod output url_web
 
 `.github/workflows/desplegar.yml`:
 
-- En cada **PR**: lint, typecheck, test y build.
+- En cada **PR**: lint, typecheck, test y build, dentro de la imagen `franqzd/shopsito-dev`
+  (el job `imagen` la publica en Docker Hub si cambió `.devcontainer/Dockerfile`).
 - En cada **push a `main`**: los mismos checks → despliega a **dev** → espera aprobación →
   despliega a **prod**. Cada despliegue es `AUTO_APPROVE=1 infra/desplegar.sh <amb>`.
 
 Configuración en GitHub (una vez, la hace alguien con permisos de admin del repo):
 
-1. **Settings → Secrets and variables → Actions**: `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID`.
+1. **Settings → Secrets and variables → Actions**: secrets `CLOUDFLARE_API_TOKEN`,
+   `CLOUDFLARE_ACCOUNT_ID` y `DOCKERHUB_TOKEN`; variable `DOCKERHUB_USERNAME`.
 2. **Settings → Environments**: crear `dev` y `prod`; a `prod` ponerle **Required reviewers**.
 3. Recomendado: proteger `main` (solo entra por PR), porque quien cambie el workflow en `main`
    puede usar el token de Cloudflare.
