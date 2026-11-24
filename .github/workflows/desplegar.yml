@@ -1,5 +1,6 @@
-# CI en cada PR y despliegue en cada push a main: checks → dev → (aprobación) → prod.
-# Secrets necesarios: CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID.
+# CI en cada PR y despliegue en cada push a main: imagen → checks → dev → (aprobación) → prod.
+# Secrets necesarios: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID y DOCKERHUB_TOKEN.
+# Variable necesaria: DOCKERHUB_USERNAME.
 # El environment `prod` debe tener "Required reviewers" en GitHub para que pida aprobación.
 name: CI y despliegue
 
@@ -16,15 +17,54 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  IMAGEN: franqzd/shopsito-dev
+
 jobs:
-  checks:
+  # Publica en Docker Hub la imagen de trabajo. La etiqueta sale del contenido del Dockerfile:
+  # si no cambió, la imagen ya existe y no se vuelve a construir.
+  imagen:
     runs-on: ubuntu-latest
+    outputs:
+      etiqueta: ${{ steps.buscar.outputs.etiqueta }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: docker/login-action@v4
         with:
-          node-version: 24
-      - run: corepack enable
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - id: buscar
+        run: |
+          etiqueta="$(sha256sum .devcontainer/Dockerfile | cut -c1-12)"
+          echo "etiqueta=$etiqueta" >>"$GITHUB_OUTPUT"
+          if docker manifest inspect "$IMAGEN:$etiqueta" >/dev/null 2>&1; then
+            echo "existe=true" >>"$GITHUB_OUTPUT"
+          fi
+      - uses: docker/setup-qemu-action@v4
+        if: steps.buscar.outputs.existe != 'true'
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        if: steps.buscar.outputs.existe != 'true'
+        with:
+          context: .devcontainer
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.IMAGEN }}:${{ steps.buscar.outputs.etiqueta }}
+      # `latest` (la de docker compose) solo avanza desde main, no desde un PR sin revisar.
+      - if: github.event_name == 'push'
+        run: docker buildx imagetools create -t "$IMAGEN:latest" "$IMAGEN:${{ steps.buscar.outputs.etiqueta }}"
+
+  checks:
+    needs: imagen
+    runs-on: ubuntu-latest
+    container:
+      image: franqzd/shopsito-dev:${{ needs.imagen.outputs.etiqueta }}
+      # Con sesión para no topar con el límite de descargas anónimas de Docker Hub.
+      credentials:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
