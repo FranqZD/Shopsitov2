@@ -17,6 +17,7 @@ import { api } from '../lib/api'
 import { CATEGORIAS } from '../lib/categorias'
 import { formatoFaltan, formatoPrecio } from '../lib/formato'
 import { prepararFoto, urlFoto } from '../lib/fotos'
+import { opcionesHora } from '../lib/horas'
 import { useAhora } from '../lib/useAhora'
 import { invalidarProductosHoy } from '../lib/useProductosHoy'
 import { useVistaPrevia } from '../lib/useVistaPrevia'
@@ -28,31 +29,25 @@ type EstadoPublicaciones =
 
 const MAX_DESC = 200
 
-/** Opciones de hora límite: "En 1 h", horas fijas y "Fin del día" (18:00). */
-function opcionesHora(ahora: Date) {
-  const { hora } = ahoraCampus(ahora)
-  const [h = 0, m = 0] = hora.split(':').map(Number)
-  const enUnaHora = `${String(Math.min(h + 1, 23)).padStart(2, '0')}:${String(m).padStart(2, '0')}`
-  const fijas = ['12:00', '14:00', '16:00'].filter((x) => x > hora)
-  return [
-    { texto: 'En 1 h', valor: enUnaHora },
-    ...fijas.map((x) => ({ texto: x, valor: x })),
-    { texto: 'Fin del día', valor: '18:00' },
-  ].filter((o, i, arr) => arr.findIndex((x) => x.valor === o.valor) === i)
-}
-
 const CAMPO =
   'w-full rounded-[18px] border-[1.5px] border-azul-100 bg-tarjeta px-[18px] text-base text-tinta outline-none placeholder:text-tinta-2/80 focus:border-azul focus:ring-2 focus:ring-azul/30'
 
 export function VenderPage() {
   const ahora = useAhora(30_000)
-  const horas = opcionesHora(ahora)
+  const { hora: horaActual } = ahoraCampus(ahora)
+  const horas = opcionesHora(horaActual)
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [precio, setPrecio] = useState('')
   const [cantidad, setCantidad] = useState(6)
   const [categoria, setCategoria] = useState<CategoriaProducto>('comida')
-  const [hora, setHora] = useState(horas[1]?.valor ?? horas[0]!.valor)
+  // Se guarda cuál atajo se eligió (no su hora) porque "En 1 h" avanza con el reloj.
+  const [atajo, setAtajo] = useState((horas[1] ?? horas[0])?.texto ?? null)
+  const [horaPropia, setHoraPropia] = useState('')
+  // Sin atajo (o si el elegido ya pasó) se usa la hora que escribe el vendedor.
+  const opcion = horas.find((h) => h.texto === atajo)
+  const hora = opcion?.valor ?? horaPropia
+  const horaPasada = hora !== '' && hora <= horaActual
   const [mensaje, setMensaje] = useState<{ texto: string; ok: boolean } | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [mias, setMias] = useState<EstadoPublicaciones>({ tipo: 'cargando' })
@@ -86,6 +81,8 @@ export function VenderPage() {
       return
     }
     setMensaje(null)
+    // El aviso ya está a la vista, debajo de la hora.
+    if (horaPasada) return
     setEnviando(true)
     try {
       const creado = await api.productos.crear({
@@ -317,21 +314,50 @@ export function VenderPage() {
             {horas.map((h) => (
               <Chip
                 key={h.valor}
-                activo={hora === h.valor}
-                onClick={() => setHora(h.valor)}
+                activo={opcion?.texto === h.texto}
+                onClick={() => setAtajo(h.texto)}
                 className="h-[46px] text-[15px] tabular-nums"
               >
                 {h.texto}
               </Chip>
             ))}
+            <Chip
+              activo={!opcion}
+              onClick={() => {
+                // Parte de la hora que ya estaba elegida para solo ajustarla.
+                if (opcion) setHoraPropia(opcion.valor)
+                setAtajo(null)
+              }}
+              className="h-[46px] text-[15px]"
+            >
+              Otra hora
+            </Chip>
           </div>
-          <div className="mt-1 flex items-start gap-2.5 rounded-chico bg-mango-50 px-3.5 py-3 text-mango-tinta">
-            <Clock size={18} strokeWidth={2.2} className="mt-0.5 flex-none" aria-hidden="true" />
-            <span className="text-sm leading-normal">
-              A las <span className="num font-bold">{hora}</span> se quita sola del catálogo y los
-              pedidos que no aceptaste se cancelan.
-            </span>
-          </div>
+          {!opcion && (
+            <input
+              type="time"
+              required
+              aria-label="Hora límite"
+              aria-invalid={horaPasada}
+              value={horaPropia}
+              onChange={(e) => setHoraPropia(e.target.value)}
+              className={`${CAMPO} h-[52px] num font-bold`}
+            />
+          )}
+          {horaPasada && (
+            <p role="alert" className="text-sm font-semibold text-error">
+              Ya son las <span className="num">{horaActual}</span>: elige una hora más tarde.
+            </p>
+          )}
+          {hora !== '' && !horaPasada && (
+            <div className="mt-1 flex items-start gap-2.5 rounded-chico bg-mango-50 px-3.5 py-3 text-mango-tinta">
+              <Clock size={18} strokeWidth={2.2} className="mt-0.5 flex-none" aria-hidden="true" />
+              <span className="text-sm leading-normal">
+                A las <span className="num font-bold">{hora}</span> se quita sola del catálogo y los
+                pedidos que no aceptaste se cancelan.
+              </span>
+            </div>
+          )}
         </div>
 
         {mensaje && (
