@@ -2,6 +2,8 @@
 name = "shopsito-api"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
+# Sentry necesita AsyncLocalStorage para separar el contexto de cada petición.
+compatibility_flags = ["nodejs_als"]
 
 [dev]
 ip = "0.0.0.0"

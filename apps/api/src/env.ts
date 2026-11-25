@@ -5,6 +5,10 @@ export type Bindings = {
   DB: D1Database
   FOTOS: R2Bucket
   JWT_SECRET: string
+  /** dev o prod (lo pone Terraform); en local no existe. */
+  AMBIENTE?: string
+  /** Sin DSN no se manda nada a Sentry. */
+  SENTRY_DSN?: string
 }
 
 export type JwtPayload = {

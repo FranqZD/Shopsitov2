@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { sign } from 'hono/jwt'
-import app from './index'
+import { app } from './index'
 import type { Bindings } from './env'
 import { JWT_ALG } from './middleware/auth'
 

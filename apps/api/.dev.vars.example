@@ -1,2 +1,4 @@
 # Copia este archivo a .dev.vars (no se sube al repo).
 JWT_SECRET="cambia-esto-por-un-secreto-largo-solo-para-local"
+# Opcional: DSN de Sentry para ver errores y trazas de tu API local (ambiente "local").
+# SENTRY_DSN="https://...@o0.ingest.us.sentry.io/0"

@@ -1,3 +1,4 @@
+import { setTag, setUser } from '@sentry/cloudflare'
 import { createMiddleware } from 'hono/factory'
 import { HTTPException } from 'hono/http-exception'
 import { jwt } from 'hono/jwt'
@@ -5,9 +6,17 @@ import type { AppEnv } from '../env'
 
 export const JWT_ALG = 'HS256'
 
-/** Exige `Authorization: Bearer <token>` y deja el payload en `c.get('jwtPayload')`. */
+/**
+ * Exige `Authorization: Bearer <token>` y deja el payload en `c.get('jwtPayload')`.
+ * También marca la petición en Sentry con el id y el rol (sin correo ni nombre).
+ */
 export const requireAuth = createMiddleware<AppEnv>((c, next) =>
-  jwt({ secret: c.env.JWT_SECRET, alg: JWT_ALG })(c, next),
+  jwt({ secret: c.env.JWT_SECRET, alg: JWT_ALG })(c, async () => {
+    const { sub, rol } = c.get('jwtPayload')
+    setUser({ id: sub })
+    setTag('rol', rol)
+    await next()
+  }),
 )
 
 /** Usar siempre después de `requireAuth`. */

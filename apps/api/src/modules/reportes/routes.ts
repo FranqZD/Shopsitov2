@@ -12,6 +12,7 @@ import type { AppEnv } from '../../env'
 import { productos, reportes, usuarios } from '../../db/schema'
 import { ahoraIso, getDb, nuevoId } from '../../lib/db'
 import { AppError, notFound } from '../../lib/errors'
+import { avisar } from '../../lib/monitoreo'
 import { validar } from '../../lib/validator'
 import { requireAdmin, requireAuth } from '../../middleware/auth'
 
@@ -54,6 +55,8 @@ export const reportesRoutes = new Hono<AppEnv>()
       ...datos,
       creadoEn: ahoraIso(),
     })
+    // Aviso para que el equipo lo vea en Sentry sin entrar al panel de admin.
+    avisar('Nuevo reporte', 'warning', { tipo: producto ? 'producto' : 'usuario' })
     return c.body(null, 201)
   })
   .get('/', requireAdmin, validar('query', listarReportesQuerySchema), async (c) => {

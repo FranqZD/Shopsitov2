@@ -13,6 +13,7 @@ src/
 │   ├── db.ts              # getDb(c), nuevoId(), ahoraIso()
 │   ├── errors.ts          # AppError, notFound(), notImplemented(c), onError, onNotFound
 │   ├── validator.ts       # validar(target, schema): zValidator que lanza al handler central
+│   ├── monitoreo.ts       # Sentry: opcionesSentry, avisar(mensaje, nivel, tags), paso(nombre, fn)
 │   └── password.ts        # hashPassword / verificarPassword (PBKDF2, WebCrypto)
 ├── middleware/auth.ts     # requireAuth (JWT HS256), requireAdmin
 └── modules/<recurso>/routes.ts

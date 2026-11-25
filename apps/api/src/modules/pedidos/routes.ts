@@ -22,6 +22,7 @@ import {
 } from '../../db/schema'
 import { ahoraIso, getDb, nuevoId, type Db } from '../../lib/db'
 import { AppError, notFound } from '../../lib/errors'
+import { avisar, paso } from '../../lib/monitoreo'
 import { validar } from '../../lib/validator'
 import { requireAuth } from '../../middleware/auth'
 import {
@@ -194,6 +195,7 @@ async function cancelarVencidos(c: Context<AppEnv>, lista: PedidoCargado[]) {
   for (const p of lista) {
     if (p.estado === 'pendiente' && pendienteVencido(p, ahora)) {
       await cambiarEstado(c, p, 'cancelado', avisoAlComprador(p, 'cancelado'))
+      avisar('Pedido cancelado por hora límite', 'info', { pedidoId: p.id })
     }
   }
 }
@@ -287,28 +289,31 @@ export const pedidosRoutes = new Hono<AppEnv>()
     const vendedorId = filas[0]!.producto.vendedorId
 
     const apartados: ItemPedido[] = []
-    for (const item of items) {
-      const [apartado] = await db
-        .update(productos)
-        .set({ cantidad: sql`${productos.cantidad} - ${item.cantidad}` })
-        .where(
-          and(
-            eq(productos.id, item.productoId),
-            eq(productos.estado, 'disponible'),
-            sql`${productos.cantidad} >= ${item.cantidad}`,
-          ),
-        )
-        .returning({ id: productos.id })
-      if (!apartado) {
-        await devolverApartado(db, apartados)
-        throw new AppError(
-          409,
-          'SIN_EXISTENCIAS',
-          'Alguien se te adelantó y ya no alcanza. Revisa lo que queda.',
-        )
+    await paso('Apartar existencias', async () => {
+      for (const item of items) {
+        const [apartado] = await db
+          .update(productos)
+          .set({ cantidad: sql`${productos.cantidad} - ${item.cantidad}` })
+          .where(
+            and(
+              eq(productos.id, item.productoId),
+              eq(productos.estado, 'disponible'),
+              sql`${productos.cantidad} >= ${item.cantidad}`,
+            ),
+          )
+          .returning({ id: productos.id })
+        if (!apartado) {
+          await devolverApartado(db, apartados)
+          avisar('Pedido sin existencias', 'warning', { productoId: item.productoId })
+          throw new AppError(
+            409,
+            'SIN_EXISTENCIAS',
+            'Alguien se te adelantó y ya no alcanza. Revisa lo que queda.',
+          )
+        }
+        apartados.push(item)
       }
-      apartados.push(item)
-    }
+    })
 
     const [comprador] = await db
       .select({ nombre: usuarios.nombre })
@@ -324,43 +329,48 @@ export const pedidosRoutes = new Hono<AppEnv>()
       creadoEn: ahoraIso(),
     }
     try {
-      await db.batch([
-        db.insert(pedidos).values(pedido),
-        db.insert(detallePedido).values(
-          items.map((i) => ({
-            id: nuevoId(),
-            pedidoId: pedido.id,
-            productoId: i.productoId,
-            cantidad: i.cantidad,
-            precioUnitario: porId.get(i.productoId)!.precio,
-          })),
-        ),
-        db.insert(notificaciones).values({
-          id: nuevoId(),
-          usuarioId: vendedorId,
-          mensaje: avisoVendedorNuevo({
-            comprador: comprador?.nombre ?? 'Alguien',
-            resumen: resumenItems(
-              items.map((i) => ({ cantidad: i.cantidad, nombre: porId.get(i.productoId)!.nombre })),
-            ),
-          }),
-          fecha: ahoraIso(),
-        }),
-        // Al llegar la cantidad a 0, el producto pasa a agotado.
-        db
-          .update(productos)
-          .set({ estado: 'agotado' })
-          .where(
-            and(
-              inArray(
-                productos.id,
-                items.map((i) => i.productoId),
-              ),
-              eq(productos.cantidad, 0),
-              eq(productos.estado, 'disponible'),
-            ),
+      await paso('Guardar pedido', () =>
+        db.batch([
+          db.insert(pedidos).values(pedido),
+          db.insert(detallePedido).values(
+            items.map((i) => ({
+              id: nuevoId(),
+              pedidoId: pedido.id,
+              productoId: i.productoId,
+              cantidad: i.cantidad,
+              precioUnitario: porId.get(i.productoId)!.precio,
+            })),
           ),
-      ])
+          db.insert(notificaciones).values({
+            id: nuevoId(),
+            usuarioId: vendedorId,
+            mensaje: avisoVendedorNuevo({
+              comprador: comprador?.nombre ?? 'Alguien',
+              resumen: resumenItems(
+                items.map((i) => ({
+                  cantidad: i.cantidad,
+                  nombre: porId.get(i.productoId)!.nombre,
+                })),
+              ),
+            }),
+            fecha: ahoraIso(),
+          }),
+          // Al llegar la cantidad a 0, el producto pasa a agotado.
+          db
+            .update(productos)
+            .set({ estado: 'agotado' })
+            .where(
+              and(
+                inArray(
+                  productos.id,
+                  items.map((i) => i.productoId),
+                ),
+                eq(productos.cantidad, 0),
+                eq(productos.estado, 'disponible'),
+              ),
+            ),
+        ]),
+      )
     } catch (e) {
       await devolverApartado(db, apartados)
       throw e
