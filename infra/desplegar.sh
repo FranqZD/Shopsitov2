@@ -29,6 +29,8 @@ if [[ -f "$RAIZ/infra/.env" ]]; then
 fi
 : "${CLOUDFLARE_API_TOKEN:?Falta CLOUDFLARE_API_TOKEN en infra/.env (copia infra/.env.example)}"
 : "${CLOUDFLARE_ACCOUNT_ID:?Falta CLOUDFLARE_ACCOUNT_ID en infra/.env (copia infra/.env.example)}"
+# Sentry es opcional: sin DSN la app funciona igual y no manda nada.
+export TF_VAR_sentry_dsn="${SENTRY_DSN_API:-}"
 cd "$RAIZ"
 tf() { "$RAIZ/infra/tf.sh" "$AMBIENTE" "$@"; }
 
@@ -38,9 +40,11 @@ node_cmd() {
     docker compose exec -T \
       -e "CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN" \
       -e "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID" \
+      -e "VITE_SENTRY_DSN=${SENTRY_DSN_WEB:-}" \
+      -e "VITE_AMBIENTE=$AMBIENTE" \
       dev sh -c "$1"
   else
-    sh -c "$1"
+    VITE_SENTRY_DSN="${SENTRY_DSN_WEB:-}" VITE_AMBIENTE="$AMBIENTE" sh -c "$1"
   fi
 }
 
