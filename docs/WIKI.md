@@ -539,6 +539,9 @@ classDiagram
         +urlFoto(fotoKey) string
         +prepararFoto(archivo) Blob
     }
+    class Horas {
+        +opcionesHora(horaActual) OpcionHora[]
+    }
     class Formato {
         +formatoPrecio(centavos) string
         +formatoCuenta(segundos) string
