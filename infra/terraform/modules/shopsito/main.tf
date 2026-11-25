@@ -44,9 +44,11 @@ resource "cloudflare_workers_script" "api" {
   content_file       = var.bundle_worker
   content_sha256     = filesha256(var.bundle_worker)
   compatibility_date = var.compatibility_date
+  # Como en wrangler.toml: Sentry usa AsyncLocalStorage.
+  compatibility_flags = ["nodejs_als"]
 
   # Mismos nombres de binding que en wrangler.toml y apps/api/src/env.ts.
-  bindings = [
+  bindings = concat([
     {
       type = "d1"
       name = "DB"
@@ -62,7 +64,19 @@ resource "cloudflare_workers_script" "api" {
       name = "JWT_SECRET"
       text = random_password.jwt_secret.result
     },
-  ]
+    {
+      # Sentry separa los eventos por ambiente con este valor.
+      type = "plain_text"
+      name = "AMBIENTE"
+      text = var.ambiente
+    },
+    ], var.sentry_dsn == "" ? [] : [
+    {
+      type = "plain_text"
+      name = "SENTRY_DSN"
+      text = var.sentry_dsn
+    },
+  ])
 
   observability = {
     enabled = true

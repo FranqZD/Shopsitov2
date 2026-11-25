@@ -1,5 +1,6 @@
 # CI en cada PR y despliegue en cada push a main: imagen → checks → dev → (aprobación) → prod.
 # Secrets necesarios: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID y DOCKERHUB_TOKEN.
+# Opcionales: SENTRY_DSN_API y SENTRY_DSN_WEB (sin ellos no se manda nada a Sentry).
 # Variable necesaria: DOCKERHUB_USERNAME.
 # El environment `prod` debe tener "Required reviewers" en GitHub para que pida aprobación.
 name: CI y despliegue
@@ -94,6 +95,8 @@ jobs:
           AUTO_APPROVE: 1
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SENTRY_DSN_API: ${{ secrets.SENTRY_DSN_API }}
+          SENTRY_DSN_WEB: ${{ secrets.SENTRY_DSN_WEB }}
 
   deploy-prod:
     needs: deploy-dev
@@ -117,3 +120,5 @@ jobs:
           AUTO_APPROVE: 1
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SENTRY_DSN_API: ${{ secrets.SENTRY_DSN_API }}
+          SENTRY_DSN_WEB: ${{ secrets.SENTRY_DSN_WEB }}

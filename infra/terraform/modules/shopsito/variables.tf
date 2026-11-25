@@ -47,3 +47,9 @@ variable "rama_produccion" {
   type        = string
   default     = "main"
 }
+
+variable "sentry_dsn" {
+  description = "DSN del proyecto de Sentry para la API. Vacío = el Worker no manda nada a Sentry."
+  type        = string
+  default     = ""
+}

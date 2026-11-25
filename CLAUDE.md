@@ -79,6 +79,8 @@ Antes de terminar cualquier cambio: `pnpm format && pnpm lint && pnpm typecheck 
 
 **Frontend:** todas las pantallas existen con el diseño final y son responsive. Sin sesión vigente (token vencido incluido) todo redirige a `/login?volver=…`; un 401 de la API cierra la sesión. Usan datos reales: catálogo (filtro por categoría y búsqueda; quita lo que cierra sin recargar y se actualiza al volver a la pestaña), detalle de producto y confirmar (vía `GET /api/productos/:id`, puntos reales), vender (publicar con categoría y foto de cámara o galería; editar, quitar y agregar más en "Lo que vendes hoy"; contador de pedidos nuevos), mis ventas (aceptar, rechazar y entregar), perfil (datos, estadísticas y reseñas reales, reportar a otra persona; en computadora el avatar abre un menú con Perfil y Salir), entrar, registro y el panel de admin completo (`/admin` productos, `/admin/puntos`, `/admin/reportes`; los admins ven "Admin" en la nav superior). El resto usa `apps/web/src/lib/ejemplos.ts` con `TODO`. Confirmar pedido llama a la API y muestra el 501. Aún no hay pantalla para el correo institucional.
 
+**Monitoreo:** Sentry en API y web (APM, trazas de punta a punta, errores 5xx y de render, mensajes con `avisar`). Se activa con `SENTRY_DSN_API`/`SENTRY_DSN_WEB`; sin DSN no hace nada. Ver `infra/README.md`.
+
 **Datos que el diseño muestra y el modelo aún no tiene:** hora de publicación, tiempo en aceptar pedidos, hora de entrega, nota del pedido, método de pago.
 
 **Siguiente paso sugerido:** flujo de pedidos de punta a punta (crear, aceptar/rechazar/entregar/cancelar, descontar inventario, notificar al vendedor).

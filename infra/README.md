@@ -111,7 +111,8 @@ infra/tf.sh prod output url_web
 Configuración en GitHub (una vez, la hace alguien con permisos de admin del repo):
 
 1. **Settings → Secrets and variables → Actions**: secrets `CLOUDFLARE_API_TOKEN`,
-   `CLOUDFLARE_ACCOUNT_ID` y `DOCKERHUB_TOKEN`; variable `DOCKERHUB_USERNAME`.
+   `CLOUDFLARE_ACCOUNT_ID` y `DOCKERHUB_TOKEN` (y opcionales `SENTRY_DSN_API` y `SENTRY_DSN_WEB`);
+   variable `DOCKERHUB_USERNAME`.
 2. **Settings → Environments**: crear `dev` y `prod`; a `prod` ponerle **Required reviewers**.
 3. Recomendado: proteger `main` (solo entra por PR), porque quien cambie el workflow en `main`
    puede usar el token de Cloudflare.
@@ -147,6 +148,28 @@ terraform apply -var account_id=$CLOUDFLARE_ACCOUNT_ID
 Terraform necesita que exista `apps/api/dist/index.js`: corre el build antes de `plan`/`apply`.
 (En el paso a paso, `terraform …` es `infra/tf.sh dev …`.)
 Cuando cambia el código de la API, el hash del bundle cambia y `apply` sube la nueva versión.
+
+## Monitoreo con Sentry (APM, trazas, errores y mensajes)
+
+Opcional: sin DSN todo funciona igual y no se manda nada. Crea en sentry.io dos proyectos
+(plataforma _Cloudflare_ para la API y _React_ para la web) y copia su DSN
+(Settings → Projects → Client Keys) en `infra/.env` como `SENTRY_DSN_API` y `SENTRY_DSN_WEB`,
+y en GitHub como secrets con el mismo nombre. Los eventos se separan por ambiente (`dev`, `prod`).
+
+- **API** (`apps/api/src/lib/monitoreo.ts`, `withSentry` en `src/index.ts`): Terraform le pone al
+  Worker `SENTRY_DSN` y `AMBIENTE`. Cada petición es una traza con el nombre de su ruta, con spans
+  de middlewares, consultas a D1, R2 y pasos propios (`paso(...)`, p. ej. "Apartar existencias").
+  Los errores 5xx se mandan solos; los 4xx son esperados y solo quedan en la traza.
+- **Web** (`apps/web/src/lib/monitoreo.ts`): mide cargas y navegaciones por ruta, captura errores de
+  render y agrega `sentry-trace` a los `fetch` de `/api`, así una traza va del clic a la base.
+  El DSN se fija al hacer build (`VITE_SENTRY_DSN`, `VITE_AMBIENTE`).
+- **Mensajes** (`avisar(...)`): pedido sin existencias, pedido cancelado por hora límite, nuevo
+  reporte y sesión rechazada por la API.
+- **Privacidad:** el usuario va solo con su id y rol; nunca se mandan cuerpos de petición
+  (llevan contraseñas) ni cookies.
+
+Para probarlo en local, pon `SENTRY_DSN` en `apps/api/.dev.vars` y/o `VITE_SENTRY_DSN` en
+`apps/web/.env.local` (ambos ignorados por git); salen con ambiente `local`.
 
 ## Primer admin
 

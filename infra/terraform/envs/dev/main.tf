@@ -43,4 +43,5 @@ module "shopsito" {
   ambiente              = "dev"
   bundle_worker         = "${path.root}/../../../../apps/api/dist/index.js"
   habilitar_workers_dev = true
+  sentry_dsn            = var.sentry_dsn
 }
