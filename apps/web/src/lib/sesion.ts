@@ -1,4 +1,5 @@
 import type { LoginResponse } from '@shopsito/shared'
+import { identificar } from './monitoreo'
 
 const CLAVE = 'shopsito.sesion'
 
@@ -34,6 +35,7 @@ export const getToken = () => getSesion()?.token ?? null
 export function guardarSesion(sesion: LoginResponse | null) {
   if (sesion) localStorage.setItem(CLAVE, JSON.stringify(sesion))
   else localStorage.removeItem(CLAVE)
+  identificar(sesion?.usuario ?? null)
 }
 
 /** `/login?volver=<ruta>` para regresar a donde iba después de entrar. */

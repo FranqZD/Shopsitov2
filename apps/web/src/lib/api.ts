@@ -26,6 +26,7 @@ import type {
   Resena,
   UsuarioPrivado,
 } from '@shopsito/shared'
+import { avisar } from './monitoreo'
 import { getToken, guardarSesion, rutaLogin } from './sesion'
 
 export class ApiRequestError extends Error {
@@ -57,6 +58,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const data: unknown = await res.json().catch(() => null)
   if (res.status === 401 && token) {
     // El token ya no sirve (venció, cambió el secreto o se desactivó la cuenta): a entrar de nuevo.
+    avisar('Sesión rechazada por la API', 'info')
     guardarSesion(null)
     location.assign(rutaLogin(location.pathname + location.search))
   }

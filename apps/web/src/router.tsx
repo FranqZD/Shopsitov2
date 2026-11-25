@@ -1,3 +1,4 @@
+import { wrapCreateBrowserRouter } from '@sentry/react/react-router'
 import { createBrowserRouter } from 'react-router'
 import { LayoutAdmin } from './components/LayoutAdmin'
 import { LayoutAcceso, LayoutConNav, LayoutMovil } from './components/Layouts'
@@ -19,7 +20,8 @@ import { RegistroPage } from './pages/RegistroPage'
 import { VenderPage } from './pages/VenderPage'
 import { VentasPage } from './pages/VentasPage'
 
-export const router = createBrowserRouter([
+// Envuelto para que Sentry nombre las trazas por ruta (`/producto/:id`, no el id concreto).
+export const router = wrapCreateBrowserRouter(createBrowserRouter)([
   {
     // Todo lo de la app exige sesión; sin ella se va a /login.
     element: <RequiereSesion />,
